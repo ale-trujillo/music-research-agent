@@ -6,11 +6,17 @@ The model sees the evidence and nothing else. There is no artist name in the
 system prompt beyond what the bundle carries, no invitation to recall anything,
 and no way to emit a citation it did not receive.
 
-The bundle is identical across all six sections, so it sits in the cached
-prefix: one cache write, five reads at roughly a tenth of the cost.
+The bundle is identical across all six sections, which looks like an obvious
+case for prompt caching -- but measurement says otherwise. The output schema is
+rendered ahead of the system prompt in the cached prefix, so each section's
+distinct schema invalidates it. Varying `effort` does not; the schema does.
+Caching here would only pay the 1.25x write premium on a prefix nothing ever
+reads, so it is deliberately absent.
 """
 
 from __future__ import annotations
+
+import asyncio
 
 import anthropic
 
@@ -98,24 +104,26 @@ SECTIONS: dict[str, tuple[type, str, str]] = {
 }
 
 
+# Sequential, the six sections take close to four minutes. They share one input
+# and never read each other, so fanning them out costs nothing in quality.
+FIRST_SECTION = "positioning"
+
+
 class AnalysisEngine:
     def __init__(self, bundle: EvidenceBundle):
         self.bundle = bundle
-        self.client = anthropic.Anthropic()
+        self.client = anthropic.AsyncAnthropic()
         self.cost_usd = 0.0
         self.cache_reads = 0
 
     def _system(self) -> list[dict]:
-        return [{
-            "type": "text",
-            "text": SYSTEM.format(evidence=self.bundle.for_prompt()),
-            # Same evidence for every section: cache it once, read it five times.
-            "cache_control": {"type": "ephemeral"},
-        }]
+        # No cache_control: see the module docstring. Re-measure with
+        # usage.cache_read_input_tokens before adding it back.
+        return [{"type": "text", "text": SYSTEM.format(evidence=self.bundle.for_prompt())}]
 
-    def run(self, section: str):
+    async def run(self, section: str):
         model_cls, effort, instruction = SECTIONS[section]
-        response = self.client.messages.parse(
+        response = await self.client.messages.parse(
             model=MODEL,
             max_tokens=MAX_TOKENS,
             system=self._system(),
@@ -125,11 +133,24 @@ class AnalysisEngine:
             output_format=model_cls,
         )
         self._track(response.usage)
+        if response.stop_reason == "max_tokens":
+            # Otherwise this surfaces as an opaque "invalid JSON" from the
+            # parser, which sends you hunting for a schema bug that isn't there.
+            raise RuntimeError(
+                f"section '{section}' hit max_tokens ({MAX_TOKENS}) and returned "
+                "truncated JSON; raise MAX_TOKENS"
+            )
         return response.parsed_output
+
+    async def run_all(self) -> dict:
+        """All six at once. Total time becomes the slowest section, not the sum."""
+        names = list(SECTIONS)
+        results = await asyncio.gather(*(self.run(s) for s in names))
+        return dict(zip(names, results, strict=True))
 
     def _track(self, usage) -> None:
         # Opus 5: $5 / $25 per MTok; cache writes ~1.25x input, reads ~0.1x.
-        write = getattr(usage, "cache_creation_input_tokens", 0) or 0
+        write = getattr(usage, "cache_creation_input_tokens", 0) or 0  # expected 0
         read = getattr(usage, "cache_read_input_tokens", 0) or 0
         self.cache_reads += read
         self.cost_usd += (

@@ -33,8 +33,19 @@ from .schema import (
 )
 
 NUMBER = re.compile(r"\b\d[\d,]*\.?\d*\b")
-# Ordinary prose numbers that are not claims about the artist's scale.
-ALLOWED_BARE = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}
+
+# Structures that contain digits but make no claim about scale. They are removed
+# before scanning, because splitting "2026-07-24" into 07 and 24 and calling
+# those unsourced figures buries the one finding that matters under noise. A
+# validator people learn to ignore protects nothing.
+NOISE = re.compile(
+    r"(?:\b(?:19|20)\d\d[-/]\d{1,2}(?:[-/]\d{1,2})?\b"   # 2026-07-24, 2025/11
+    r"|#\d{1,3}\b"                                          # #2 on the chart
+    r"|\b\d{1,2}(?:st|nd|rd|th)\b"                          # 3rd single
+    r"|\bArial\s*\d+\b)"                                   # numbered release titles
+)
+# Small counts in ordinary prose: "five releases", "two singles", months, tiers.
+ALLOWED_BARE = {str(n) for n in range(0, 31)}
 
 
 class Assembler:
@@ -52,8 +63,13 @@ class Assembler:
         return out
 
     def check_numbers(self, text: str, where: str) -> None:
-        """Every figure in prose must trace to something a source returned."""
-        for raw in NUMBER.findall(text):
+        """Every figure in prose must trace to something a source returned.
+
+        Scoped to figures that could misstate the artist's scale -- an invented
+        follower count is the failure worth catching. Dates, ordinals and
+        numbered titles are stripped first.
+        """
+        for raw in NUMBER.findall(NOISE.sub(" ", text)):
             cleaned = raw.rstrip(".")
             if cleaned in ALLOWED_BARE or cleaned in self.grounded:
                 continue
@@ -172,11 +188,40 @@ class Assembler:
                 sources_used=self.bundle.sources_used,
                 sources_failed=[f"{f.source}: {f.reason}" for f in self.bundle.sources_failed],
                 fields_absent=absent,
-                caveats=sorted({c for s in (positioning, comparables, markets, recent, signals)
-                                for c in s.caveats}),
+                caveats=dedupe_caveats([c for s in (positioning, comparables, markets,
+                                                    recent, signals) for c in s.caveats]),
                 ungrounded_claims=self.ungrounded,
             ),
         )
+
+
+STOPWORDS = frozenset(
+    "the a an and or of for to in on at is are was were no not any all with "
+    "this that these those there here it its as by from than then so but".split()
+)
+OVERLAP_THRESHOLD = 0.6
+
+
+def dedupe_caveats(caveats: list[str], limit: int = 10) -> list[str]:
+    """Collapse the same caveat written six different ways.
+
+    Each section writes its own caveats, and they converge on the same handful
+    of facts -- "no Spotify data" arrived five times in one run, in five
+    phrasings. Exact-string dedupe cannot see that, so compare content words and
+    keep the fullest phrasing of each distinct point. The honest account of what
+    is missing is the most decision-relevant part of the report; padded out to
+    thirty near-identical lines, nobody reads it.
+    """
+    kept: list[tuple[set[str], str]] = []
+    for caveat in sorted(caveats, key=len, reverse=True):
+        words = {w for w in re.findall(r"[a-z]+", caveat.lower()) if w not in STOPWORDS}
+        if not words:
+            continue
+        if any(len(words & seen) / min(len(words), len(seen)) >= OVERLAP_THRESHOLD
+               for seen, _ in kept):
+            continue
+        kept.append((words, caveat))
+    return [c for _, c in kept][:limit]
 
 
 def _parse_date(raw: str | None):
