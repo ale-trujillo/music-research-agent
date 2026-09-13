@@ -115,6 +115,11 @@ class AnalysisEngine:
         self.client = anthropic.AsyncAnthropic()
         self.cost_usd = 0.0
         self.cache_reads = 0
+        # Per-section usage. Reconstructing spend from the finished report does
+        # not work -- the assembler expands evidence keys into full citations,
+        # so the report is far larger than anything the model wrote. Record it
+        # at the call site or do not claim to know it.
+        self.usage_log: list[dict] = []
 
     def _system(self) -> list[dict]:
         # No cache_control: see the module docstring. Re-measure with
@@ -132,7 +137,7 @@ class AnalysisEngine:
             messages=[{"role": "user", "content": instruction}],
             output_format=model_cls,
         )
-        self._track(response.usage)
+        self._track(response.usage, section, effort)
         if response.stop_reason == "max_tokens":
             # Otherwise this surfaces as an opaque "invalid JSON" from the
             # parser, which sends you hunting for a schema bug that isn't there.
@@ -148,14 +153,21 @@ class AnalysisEngine:
         results = await asyncio.gather(*(self.run(s) for s in names))
         return dict(zip(names, results, strict=True))
 
-    def _track(self, usage) -> None:
+    def _track(self, usage, section: str = "", effort: str = "") -> None:
         # Opus 5: $5 / $25 per MTok; cache writes ~1.25x input, reads ~0.1x.
         write = getattr(usage, "cache_creation_input_tokens", 0) or 0  # expected 0
         read = getattr(usage, "cache_read_input_tokens", 0) or 0
         self.cache_reads += read
-        self.cost_usd += (
+        cost = (
             usage.input_tokens * 5 / 1_000_000
             + write * 6.25 / 1_000_000
             + read * 0.5 / 1_000_000
             + usage.output_tokens * 25 / 1_000_000
         )
+        self.cost_usd += cost
+        self.usage_log.append({
+            "section": section, "effort": effort,
+            "input_tokens": usage.input_tokens,
+            "output_tokens": usage.output_tokens,
+            "cost_usd": round(cost, 5),
+        })
