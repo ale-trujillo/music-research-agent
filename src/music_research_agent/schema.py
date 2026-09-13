@@ -216,8 +216,16 @@ class AudienceShape(Section):
 
     signals: list[AudienceSignal] = Field(default_factory=list)
     ratios: list[AudienceRatio] = Field(default_factory=list)
-    profile: str
+    profile: str = Field(
+        description="Names the shape among platforms we can measure — never "
+        "asserts a shape on platforms we cannot see"
+    )
     notes: list[str] = Field(default_factory=list)
+    unobserved: list[str] = Field(
+        default_factory=list,
+        description="Platforms with no public audience data, which the profile "
+        "therefore cannot account for",
+    )
 
 
 class DataQuality(BaseModel):

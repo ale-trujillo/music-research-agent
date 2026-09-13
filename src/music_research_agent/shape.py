@@ -41,9 +41,24 @@ WHY_NO_TOTAL = (
     "the artist's own distributor reporting or in licensed industry data."
 )
 
-HEAVY_SKEW = 10       # one platform this far ahead is a shape, not noise
-LOYAL_PLAYS = 8.0     # plays per listener that indicates return listening
-THIN_CONVERSION = 50  # views per DSP follower above this is a conversion gap
+HEAVY_SKEW = 10    # one platform this far ahead is a shape, not noise
+LOYAL_PLAYS = 8.0  # plays per listener that indicates return listening
+
+# The platforms that carry most streaming in this market and publish no public
+# audience figures. Naming them is not a footnote: the streaming side of every
+# comparison below rests on Deezer and Last.fm, both marginal in Colombia, so a
+# "video-led" shape can mean the audience is on video -- or merely that video is
+# the side we can measure. An earlier version of this classifier called three of
+# four test artists "DSP-unconverted", which was a statement about our blind
+# spot wearing the costume of a finding.
+UNOBSERVED = ("Spotify", "Apple Music")
+BLIND_SPOT = (
+    "Spotify and Apple Music carry most streaming in this market and expose no "
+    "public audience figures. The streaming side here is Deezer and Last.fm, both "
+    "minor in Colombia, so a video-led shape may describe what is measurable "
+    "rather than where the audience is. Treat it as a question to put to the "
+    "artist, not a conclusion."
+)
 
 
 def build_shape(bundle: EvidenceBundle) -> AudienceShape:
@@ -99,25 +114,33 @@ def build_shape(bundle: EvidenceBundle) -> AudienceShape:
     profile = "insufficient data to characterise"
     if yt_subs and dsp:
         if yt_subs > dsp * HEAVY_SKEW:
-            profile = "video-led, DSP-unconverted"
+            # Deliberately not "unconverted". We cannot see the platform where
+            # conversion would show up, so the gap is a question, not a verdict.
+            profile = "video-led among measured platforms"
             notes.append(
-                f"YouTube holds {yt_subs / dsp:.0f}x the audience the streaming "
-                "platforms show. The video audience exists; it has not moved to DSPs."
+                f"YouTube shows {yt_subs / dsp:.0f}x the audience visible on the "
+                "streaming platforms we can read. Whether that is a conversion "
+                f"gap or a measurement gap depends on {' and '.join(UNOBSERVED)}, "
+                "which are unobserved here."
             )
         elif dsp > yt_subs * HEAVY_SKEW:
-            profile = "DSP-led, little video presence"
-            notes.append("Streaming platforms carry the audience; video is not a channel here.")
+            profile = "audience sits on streaming, not video"
+            notes.append(
+                "Even the minor streaming platforms outweigh video, which makes "
+                "this the one shape the blind spot cannot be producing."
+            )
         else:
-            profile = "balanced across video and streaming"
+            profile = "comparable on video and measured streaming"
     elif dsp and not yt_subs:
-        profile = "streaming-only — no verified artist channel on YouTube"
+        profile = "measured on streaming only — no verified YouTube channel"
         notes.append("Catalogue is distributed, but no artist-run YouTube channel was verified.")
 
-    if views and dsp and views / dsp > THIN_CONVERSION:
+    if views and dsp:
         notes.append(
-            f"{views:,} lifetime views against {dsp:,} followers and listeners "
-            "combined. Ask for the traffic-source and geography breakdown before "
-            "reading the view count as demand."
+            f"{views:,} lifetime views against {dsp:,} followers and listeners on "
+            "measurable platforms. The traffic-source and geography breakdown is "
+            "what separates real demand from paid or incidental views, and it is "
+            "not public."
         )
     if plays_per_listener and plays_per_listener >= LOYAL_PLAYS:
         notes.append(
@@ -134,7 +157,11 @@ def build_shape(bundle: EvidenceBundle) -> AudienceShape:
 
     return AudienceShape(
         confidence=confidence,
-        evidence_basis=f"headline figures from {', '.join(sorted(covered)) or 'no platform'}",
-        caveats=[WHY_NO_TOTAL],
+        evidence_basis=(
+            f"headline figures from {', '.join(sorted(covered)) or 'no platform'}; "
+            f"{' and '.join(UNOBSERVED)} unobserved"
+        ),
+        caveats=[WHY_NO_TOTAL, BLIND_SPOT],
         signals=signals, ratios=ratios, profile=profile, notes=notes,
+        unobserved=list(UNOBSERVED),
     )

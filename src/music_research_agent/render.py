@@ -88,7 +88,11 @@ def render(r: ArtistReport) -> str:
 
     sh = r.audience_shape
     add(f"## Audience shape {MARK[sh.confidence]}")
-    add(f"**{sh.profile}**\n")
+    add(f"**{sh.profile}**")
+    if sh.unobserved:
+        add(f"\n*Not measured: {', '.join(sh.unobserved)} — no public audience data*\n")
+    else:
+        add("")
     if sh.signals:
         add("| Platform | Figure | Unit | What it counts |")
         add("|---|---|---|---|")
@@ -101,7 +105,8 @@ def render(r: ArtistReport) -> str:
             add(f"- **{ra.name}: {ra.value:,}** — {ra.reads_as}")
     for note in sh.notes:
         add(f"\n{note}")
-    add(f"\n> {sh.caveats[0]}" if sh.caveats else "")
+    for caveat in sh.caveats:
+        add(f"\n> {caveat}")
     add("")
 
     s = r.signals
