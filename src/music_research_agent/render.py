@@ -86,6 +86,24 @@ def render(r: ArtistReport) -> str:
         add(f"- {_claim(b)}")
     add("")
 
+    sh = r.audience_shape
+    add(f"## Audience shape {MARK[sh.confidence]}")
+    add(f"**{sh.profile}**\n")
+    if sh.signals:
+        add("| Platform | Figure | Unit | What it counts |")
+        add("|---|---|---|---|")
+        for sig in sh.signals:
+            link = f"[{sig.citation.source}]({sig.citation.url})" if sig.citation.url else sig.citation.source
+            add(f"| {sig.platform} | {sig.value:,} | {sig.unit} | {sig.measures} · {link} |")
+    if sh.ratios:
+        add("\n**Derived ratios** — arithmetic on the figures above, not reported by any source\n")
+        for ra in sh.ratios:
+            add(f"- **{ra.name}: {ra.value:,}** — {ra.reads_as}")
+    for note in sh.notes:
+        add(f"\n{note}")
+    add(f"\n> {sh.caveats[0]}" if sh.caveats else "")
+    add("")
+
     s = r.signals
     add(f"## Signals {MARK[s.confidence]}")
     add(f"**Momentum:** {s.momentum}")

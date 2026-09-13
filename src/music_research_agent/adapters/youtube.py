@@ -142,19 +142,24 @@ class YouTubeAdapter(CorroboratingAdapter):
                 ))
         return out
 
+    # Any source that can name a release feeds the corroboration. Reading only
+    # specific sources here once cost this adapter its accuracy: when Spotify
+    # left the fan-out, the known set silently shrank from thirteen titles to
+    # five, the artist's real channel matched none of them, and a channel with
+    # 105 subscribers won on a country match over one with 138,000.
+    TITLE_KEYS = ("deezer.top_track", "deezer.recent_release", "spotify.recent_release")
+
     def _known_titles(self, bundle: EvidenceBundle) -> set[str]:
-        """Track and release names already established by ID-joined sources."""
+        """Every release or track name any source has established."""
         known: set[str] = set()
         for item in bundle.items:
             if not isinstance(item.value, str):
                 continue
-            if item.key.startswith("deezer.top_track"):
-                known.add(_norm(item.value))
-            elif item.key.startswith("spotify.recent_release"):
-                # stored as "2026-07-24 — Suegra (single)"
-                if "—" in item.value:
-                    title = item.value.split("—", 1)[1].rsplit("(", 1)[0]
-                    known.add(_norm(title))
+            if not item.key.startswith(self.TITLE_KEYS):
+                continue
+            # Dated entries are stored as "2026-07-24 — Suegra (single)".
+            value = item.value.split("—", 1)[1].rsplit("(", 1)[0] if "—" in item.value else item.value
+            known.add(_norm(value))
         return {k for k in known if len(k) > 3}
 
     async def _recent_titles(self, channel: dict, client: httpx.AsyncClient, key: str) -> list[str]:

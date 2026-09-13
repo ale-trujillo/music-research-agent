@@ -185,6 +185,41 @@ class Signals(Section):
     )
 
 
+class AudienceSignal(BaseModel):
+    """One platform's headline number, with what it actually counts."""
+
+    platform: str
+    metric: str
+    value: int
+    unit: str
+    measures: str = Field(description="What this figure counts, in plain English")
+    citation: Citation
+
+
+class AudienceRatio(BaseModel):
+    """Arithmetic over two cited figures. Derived, and labelled as such."""
+
+    name: str
+    value: float
+    derived_from: list[str]
+    reads_as: str
+    citations: list[Citation] = Field(default_factory=list)
+
+
+class AudienceShape(Section):
+    """The cross-platform picture, deliberately without a total.
+
+    The platforms measure different things, so they are shown side by side
+    rather than added. `profile` names the shape, which is the part an A&R
+    reader acts on.
+    """
+
+    signals: list[AudienceSignal] = Field(default_factory=list)
+    ratios: list[AudienceRatio] = Field(default_factory=list)
+    profile: str
+    notes: list[str] = Field(default_factory=list)
+
+
 class DataQuality(BaseModel):
     """A visible section of the report, not debug metadata.
 
@@ -212,6 +247,7 @@ class ArtistReport(BaseModel):
 
     identity: Identity
     snapshot: Snapshot
+    audience_shape: AudienceShape
     positioning: Positioning
     comparables: Comparables
     markets: Markets

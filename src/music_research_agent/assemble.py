@@ -14,6 +14,7 @@ from datetime import UTC, datetime
 from .analysis.drafts import ClaimDraft
 from .collect import SOURCE_COUNT
 from .evidence import EvidenceBundle
+from .shape import build_shape
 from .schema import (
     ActivityEvent,
     ArtistReport,
@@ -181,7 +182,8 @@ class Assembler:
             generated_at=datetime.now(UTC), run_id=run_id,
             duration_s=round(duration_s, 1), cost_usd=round(cost_usd, 4),
             identity=self.bundle.identity,
-            snapshot=snapshot, positioning=positioning, comparables=comparables,
+            snapshot=snapshot, audience_shape=build_shape(self.bundle),
+            positioning=positioning, comparables=comparables,
             markets=markets, recent_activity=recent, signals=signals,
             ar_summary=ar_summary,
             data_quality=DataQuality(
