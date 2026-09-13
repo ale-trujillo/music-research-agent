@@ -5,3 +5,4 @@ runs/
 .cache/
 .venv/
 venv/
+GOLDEN_SET.md
