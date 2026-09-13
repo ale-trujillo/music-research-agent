@@ -17,19 +17,32 @@ MARK = {
 }
 
 
-def _claim(c: Claim) -> str:
-    refs = ""
-    if c.citations:
-        seen: list[str] = []
-        for cit in c.citations:
-            label = cit.url or cit.source
-            if label not in seen:
-                seen.append(label)
-        refs = " " + " ".join(f"[{s}]({u})" if u.startswith("http") else f"`{s}`"
-                              for s, u in ((c.source, c.url or c.source) for c in c.citations)
-                              if u in seen[:3])
-    tag = "" if c.citations else " *(inference)*"
-    return f"{c.text}{tag}{refs}"
+MAX_REFS = 3
+
+
+def _claim(claim: Claim) -> str:
+    """One reference per distinct source.
+
+    A claim drawn from six evidence keys on the same platform carries six
+    identical citations. Printing each one turns a readable sentence into a
+    wall of repeated links and makes the citation itself feel like noise
+    rather than a thing worth checking.
+    """
+    if not claim.citations:
+        return f"{claim.text} *(inference)*"
+
+    unique: list[tuple[str, str | None]] = []
+    for cite in claim.citations:
+        pair = (cite.source, cite.url)
+        if pair not in unique:
+            unique.append(pair)
+
+    refs = " ".join(
+        f"[{source}]({url})" if url else f"`{source}`"
+        for source, url in unique[:MAX_REFS]
+    )
+    more = f" +{len(unique) - MAX_REFS}" if len(unique) > MAX_REFS else ""
+    return f"{claim.text} {refs}{more}"
 
 
 def render(r: ArtistReport) -> str:
