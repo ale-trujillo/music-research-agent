@@ -26,7 +26,15 @@ from .base import CorroboratingAdapter
 
 SEARCH = "https://www.googleapis.com/youtube/v3/search"
 CHANNELS = "https://www.googleapis.com/youtube/v3/channels"
+PLAYLIST_ITEMS = "https://www.googleapis.com/youtube/v3/playlistItems"
 EXPECTED_COUNTRY = "CO"
+
+# Quota arithmetic decides the design here. search.list costs 100 units against
+# a 10,000/day allowance; playlistItems.list costs 1. Listing a channel's
+# uploads playlist instead of searching it takes a run from ~900 units to ~105,
+# which is the difference between 11 artists a day and 95.
+SEARCH_COST = 100
+CHANNEL_LIST_PART = "snippet,statistics,contentDetails"
 
 
 def _norm(text: str) -> str:
@@ -54,7 +62,7 @@ class YouTubeAdapter(CorroboratingAdapter):
             return []
 
         detail = await client.get(CHANNELS, params={
-            "key": key, "id": ",".join(ids), "part": "snippet,statistics",
+            "key": key, "id": ",".join(ids), "part": CHANNEL_LIST_PART,
         })
         detail.raise_for_status()
 
@@ -71,7 +79,7 @@ class YouTubeAdapter(CorroboratingAdapter):
             title = snippet["title"]
             if _norm(identity.resolved_name) not in _norm(title):
                 continue
-            titles = await self._recent_titles(ch["id"], client, key)
+            titles = await self._recent_titles(ch, client, key)
             matched = [t for t in titles if _norm(t) in known or any(k in _norm(t) for k in known)]
             in_country = snippet.get("country") == EXPECTED_COUNTRY
             score = len(matched) * 10 + (3 if in_country else 0)
@@ -149,10 +157,21 @@ class YouTubeAdapter(CorroboratingAdapter):
                     known.add(_norm(title))
         return {k for k in known if len(k) > 3}
 
-    async def _recent_titles(self, channel_id: str, client: httpx.AsyncClient, key: str) -> list[str]:
-        r = await client.get(SEARCH, params={
-            "key": key, "channelId": channel_id, "type": "video",
-            "part": "snippet", "order": "date", "maxResults": 10,
+    async def _recent_titles(self, channel: dict, client: httpx.AsyncClient, key: str) -> list[str]:
+        """Recent uploads, via the playlist rather than search.
+
+        Every channel has an auto-maintained uploads playlist. Reading it costs
+        one quota unit; searching the same channel costs a hundred.
+        """
+        uploads = (
+            channel.get("contentDetails", {})
+            .get("relatedPlaylists", {})
+            .get("uploads")
+        )
+        if not uploads:
+            return []
+        r = await client.get(PLAYLIST_ITEMS, params={
+            "key": key, "playlistId": uploads, "part": "snippet", "maxResults": 15,
         })
         if r.status_code != 200:
             return []
