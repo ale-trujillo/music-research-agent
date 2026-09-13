@@ -47,6 +47,29 @@ class SourceAdapter(ABC):
         is a legitimate and informative answer."""
 
 
+class CorroboratingAdapter(SourceAdapter):
+    """A source that cannot be trusted on a name match alone.
+
+    Some sources identify an artist only by a display name, with no stable ID
+    to join on. Probing the golden set, a short artist name matched a channel
+    with 235,000 subscribers belonging to an unrelated producer in another
+    country, while the real artist had about 24. Reporting that would have been
+    wrong by four orders of magnitude, with a citation attached.
+
+    These adapters run in a second wave and must corroborate a candidate
+    against evidence already in the bundle before claiming anything.
+    """
+
+    @abstractmethod
+    async def fetch_corroborated(
+        self, identity: Identity, client: httpx.AsyncClient, bundle: "EvidenceBundle"
+    ) -> list[Evidence]:
+        ...
+
+    async def fetch(self, identity: Identity, client: httpx.AsyncClient) -> list[Evidence]:
+        raise NotImplementedError("use fetch_corroborated")
+
+
 async def run_adapters(
     adapters: list[SourceAdapter],
     identity: Identity,
@@ -74,4 +97,28 @@ async def run_adapters(
             bundle.add(*result)
         else:
             bundle.fail(adapter.name, "no data for this artist")
+    return bundle
+
+
+async def run_corroborating(
+    adapters: list["CorroboratingAdapter"],
+    identity: Identity,
+    bundle: EvidenceBundle,
+    client: httpx.AsyncClient,
+) -> EvidenceBundle:
+    """Second wave: sources that need the first wave's evidence to verify identity."""
+    for adapter in adapters:
+        if not adapter.is_configured():
+            bundle.fail(adapter.name, f"missing credentials: {', '.join(adapter.missing_env())}")
+            continue
+        try:
+            async with asyncio.timeout(adapter.timeout):
+                found = await adapter.fetch_corroborated(identity, client, bundle)
+            bundle.add(*found) if found else bundle.fail(
+                adapter.name, "no candidate could be corroborated against known releases"
+            )
+        except TimeoutError:
+            bundle.fail(adapter.name, f"timed out after {adapter.timeout}s")
+        except Exception as exc:  # noqa: BLE001
+            bundle.fail(adapter.name, str(exc))
     return bundle

@@ -57,9 +57,32 @@ back at `match=1.0` for three unrelated artists -- co-listening inside a small
 shared audience. Last.fm generates comparable *candidates*; something else has
 to corroborate them before the report presents them as comparables.
 
-## YouTube
+## YouTube — richest traction signal, weakest identity guarantee
 
-Unverified -- credentials not yet available.
+Deezer fan counts badly understate reach in this market. The same artists show
+one to three orders of magnitude more audience on YouTube. It is the single
+most informative source here -- and the most dangerous.
+
+**The failure it nearly caused:** a short artist name matched a channel with
+235,000 subscribers and 86M views run by an unrelated producer in another
+country. The real artist has about 24. A name-matching adapter would have
+published that with a citation attached.
+
+**What makes it safe:** the auto-generated `<Artist> - Topic` channel is built
+from the distributor's catalog, so its video titles are the artist's actual
+releases. Overlapping those against releases already established by Deezer and
+Spotify proves the channel belongs to this artist.
+
+The two channel kinds answer different questions and both are collected:
+
+| Channel | Answers | Counts mean |
+|---|---|---|
+| `<Artist> - Topic` | Is this really them? | Nothing -- nobody subscribes to catalog channels |
+| Artist's own channel | How much reach? | Real traction, once corroborated |
+
+An artist with a catalog channel but no verifiable artist channel is reported
+as exactly that. Distributed but not building a YouTube audience is an A&R
+signal, not missing data.
 
 ---
 
