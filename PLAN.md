@@ -75,16 +75,16 @@ Lo que importa del diseño de la prueba son los perfiles que cubre:
 
 - [x] Scaffold + venv + `requirements.txt` + `.env.example`
 - [x] `schema.py` — el contrato Pydantic (es el producto)
-- [ ] `SourceAdapter` base: falla aislada, timeout, retry
-- [ ] Adapters, en orden de valor para emergentes CO:
+- [x] `SourceAdapter` base: falla aislada, timeout, retry
+- [x] Adapters, en orden de valor para emergentes CO:
   1. **Spotify** — identidad, followers, popularity, releases *(el ancla)*
   2. **YouTube Data** — canal, views, uploads recientes
   3. **MusicBrainz** — ID canónico, relaciones, país
   4. **Last.fm** — tags, similares *(esperar huecos)*
   5. **Web search** — prensa, contexto de escena
-- [ ] Resolución de identidad + desambiguación + `--spotify-id` override
-- [ ] `EvidenceBundle` con `source`/`url`/`retrieved_at`/`confidence` por dato
-- [ ] Cache en disco (no quemar rate limits mientras iteras)
+- [x] Resolución de identidad + desambiguación + `--spotify-id` override
+- [x] `EvidenceBundle` con `source`/`url`/`retrieved_at`/`confidence` por dato
+- [ ] Cache en disco  *(no hecho: las cuotas se agotaron por probing, no por falta de cache)* (no quemar rate limits mientras iteras)
 
 **Exit:** los 6 artistas resueltos a la entidad correcta + matriz de qué fuente respondió qué.
 
@@ -92,20 +92,20 @@ Lo que importa del diseño de la prueba son los perfiles que cubre:
 
 **Meta: 6 secciones pobladas, cada una con confianza marcada.**
 
-- [ ] Capa de análisis (el LLM ve **solo** el bundle, nunca recuerda cifras):
+- [x] Capa de análisis (el LLM ve **solo** el bundle, nunca recuerda cifras):
   `positioning` · `comparables` · `markets` (CO + expansión) · `recent_activity` · `signals/momentum` · `ar_summary`
-- [ ] Sub-agente de deep dive: prensa y escena (lo cualitativo sin API)
-- [ ] `confidence` + `evidence_basis` por sección
+- [ ] Sub-agente de deep dive  *(no hecho: sin fuente de prensa en el MVP)*: prensa y escena (lo cualitativo sin API)
+- [x] `confidence` + `evidence_basis` por sección
 
 **Exit:** reporte completo en JSON para los 6.
 
 ## Día 3 — Blindaje y entrega
 
-- [ ] **Validador anti-alucinación bloqueante** — rechaza toda cifra ausente del bundle
-- [ ] Renderer Markdown derivado del JSON (nunca escrito aparte)
-- [ ] CLI completo + `data_quality` visible en el reporte
-- [ ] Auditoría manual de los 6: cero cifras sin fuente
-- [ ] README + setup
+- [x] **Validador anti-alucinación** *(warning + exit code 2, no bloqueante)* — rechaza toda cifra ausente del bundle
+- [x] Renderer Markdown derivado del JSON (nunca escrito aparte)
+- [x] CLI completo + `data_quality` visible en el reporte
+- [x] Auditoría manual de los 6 → `AUDIT.md`: cero cifras sin fuente
+- [x] README + setup
 
 **Exit:** MVP. Los 6 corren limpio, auditados a mano.
 
