@@ -84,6 +84,13 @@ class SpotifyAdapter(SourceAdapter):
 
         Restricted apps reject any `limit` above 10 with a 400, but `offset`
         paging still works, so walk it 10 at a time.
+
+        Transport failures are raised rather than swallowed. Returning an empty
+        list on a 429 made the runner report "no data for this artist" when the
+        truth was "we never got to ask" -- and those are different facts about
+        an artist, not degrees of the same one. Now that reports cite absent
+        sources, reporting the wrong reason puts a false statement under a
+        citation.
         """
         releases: list[tuple[str, str, str]] = []
         total = 0
@@ -93,7 +100,14 @@ class SpotifyAdapter(SourceAdapter):
                 f"{API}/artists/{artist_id}/albums", headers=headers,
                 params={"limit": PAGE_SIZE, "offset": offset, "include_groups": "album,single"},
             )
+            if r.status_code in (429, 500, 502, 503):
+                raise RuntimeError(
+                    f"rate limited or unavailable (HTTP {r.status_code}); "
+                    "coverage gap is ours, not the artist's"
+                )
             if r.status_code != 200:
+                if offset == 0:
+                    raise RuntimeError(f"HTTP {r.status_code}: {r.text[:120]}")
                 break
             data = r.json()
             total = data.get("total", total)

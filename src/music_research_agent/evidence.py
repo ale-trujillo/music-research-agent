@@ -86,7 +86,9 @@ class EvidenceBundle(BaseModel):
         self.sources_failed.append(SourceFailure(source=source, reason=reason))
         self.items.append(Evidence(
             key=f"source_status.{source}",
-            value=f"returned no data ({reason})",
+            # Not "returned no data": a source we could not reach did not tell
+            # us anything about this artist either way.
+            value=f"not retrieved — {reason}",
             confidence=Confidence.ABSENT,
             citation=Citation(
                 source=source, url=None, retrieved_at=datetime.now(UTC),
