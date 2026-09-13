@@ -6,3 +6,4 @@ runs/
 .venv/
 venv/
 GOLDEN_SET.md
+.DS_Store
