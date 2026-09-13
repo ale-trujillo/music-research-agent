@@ -84,6 +84,7 @@ class Identity(BaseModel):
 
     resolved_name: str
     spotify_id: str | None = None
+    deezer_id: str | None = None
     musicbrainz_id: str | None = None
     origin_country: str | None = None
     origin_city: str | None = None

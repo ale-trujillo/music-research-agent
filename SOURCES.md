@@ -11,7 +11,7 @@ App created under the post-2024 restricted regime for new apps.
 |---|---|---|
 | `search` (artist, track) | ✅ | Returns a **simplified** artist object |
 | `GET /artists/{id}` | ⚠️ 200 | Only `id, name, images, uri, href, external_urls`. **No `followers`, `popularity` or `genres`** |
-| `GET /artists/{id}/albums` | ✅ | Full discography with release dates (52 for the test artist) |
+| `GET /artists/{id}/albums` | ✅ | Full discography with release dates. **`limit` is hard-capped at 10** -- 11 and above return 400. `offset` paging works, so walk it 10 at a time |
 | `GET /artists?ids=` (batch) | ❌ 403 | Forbidden |
 | `GET /artists/{id}/top-tracks` | ❌ 403 | Forbidden |
 | `GET /artists/{id}/related-artists` | ❌ 403 | Forbidden |
@@ -38,10 +38,28 @@ Found 1 of 6. For the rest it returned nothing or confidently wrong matches
 `score=100`). Keep it for canonical IDs when it hits; never trust its score
 alone for disambiguation.
 
-## Pending probes
+## Last.fm — listeners everywhere, genre almost nowhere
 
-Last.fm and YouTube are unverified — credentials not yet available. Both are
-now load-bearing, not optional (see below).
+| Call | Result on the golden set |
+|---|---|
+| `artist.getInfo` listeners / playcount | ✅ 6 of 6 |
+| `artist.getInfo` tags | ⚠️ **2 of 6** |
+| `artist.getTopTags` | ❌ 0 of 6 |
+| `artist.getSimilar` | ✅ 6 of 6 |
+| `bio` | ❌ empty for all 6 |
+
+Genre had to come from Deezer instead. Aggregating tags from an artist's
+similar artists was tried as a fallback and produced usable output for only
+one of four, with user-tag noise otherwise.
+
+**Similarity scores are not trustworthy at this tier.** One mid-size act came
+back at `match=1.0` for three unrelated artists -- co-listening inside a small
+shared audience. Last.fm generates comparable *candidates*; something else has
+to corroborate them before the report presents them as comparables.
+
+## YouTube
+
+Unverified -- credentials not yet available.
 
 ---
 
