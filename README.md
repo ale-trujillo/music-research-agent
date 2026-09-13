@@ -5,10 +5,28 @@ report. Built for **emerging Colombian artists**, where the data is thin and
 the failure mode that matters is a confident report about the wrong person.
 
 ```bash
+# By name
 python -m music_research_agent "Artist Name"
+
+# By pasted profile URL — Spotify, Deezer, YouTube, Apple Music, Last.fm,
+# MusicBrainz. Preferred: the platform already identified the artist, so
+# nothing is ranked and nothing can resolve to the wrong person.
+python -m music_research_agent "https://open.spotify.com/artist/68LgpW..."
+
+# Find the artist first when the name is ambiguous
+python -m music_research_agent --search "akuo"
+
 # runs/<artist-id>/<run-id>/report.json   the contract
 # runs/<artist-id>/<run-id>/report.md     the readable version
 ```
+
+Search is proxied live against Deezer rather than served from an index of our
+own. An index has to be populated and kept fresh, and the open alternative —
+MusicBrainz — covers emerging Latin American artists poorly: one of six on the
+acceptance set. Deezer's catalogue is complete, current, unauthenticated and
+unmetered, so the catalogue stays its problem. Results are re-ranked by name
+match before audience size, which is why typing a small artist's exact name
+surfaces them above the famous act they resemble.
 
 Roughly 35-70 seconds and $0.30-0.50 per report.
 

@@ -16,7 +16,10 @@ import unicodedata
 
 import httpx
 
+import os
+
 from .adapters import deezer, spotify
+from .identify import PlatformRef, looks_like_url, parse_reference
 from .schema import Confidence, Identity
 
 
@@ -30,6 +33,21 @@ def normalize(name: str) -> str:
 async def resolve(
     query: str, client: httpx.AsyncClient, spotify_id_override: str | None = None
 ) -> Identity:
+    """Resolve a name, or a pasted profile URL.
+
+    A URL short-circuits everything below. The platform already made the
+    identification, so there is no ranking to do and no chance of picking the
+    wrong artist -- which is why pasting a link is the input to prefer.
+    """
+    if (ref := parse_reference(query)) is not None:
+        return await _from_reference(ref, client)
+    if looks_like_url(query):
+        raise ValueError(
+            f"that looks like a link but not one we recognise: {query[:80]}\n"
+            "Supported: Spotify, Deezer, YouTube, Apple Music, Last.fm, MusicBrainz "
+            "artist pages — or just type the artist's name."
+        )
+
     target = normalize(query)
     alternates: list[str] = []
 
@@ -79,3 +97,82 @@ async def resolve(
         disambiguation_confidence=confidence,
         alternates_considered=alternates[:8],
     )
+
+
+async def _from_reference(ref: PlatformRef, client: httpx.AsyncClient) -> Identity:
+    """Turn a platform identifier into an identity, cross-linking the others.
+
+    Whichever platform the link came from, the artist's name is read from that
+    platform and used to find the matching profile elsewhere. The originating
+    identifier is authoritative; the cross-links are best-effort.
+    """
+    name: str | None = None
+    deezer_id: str | None = None
+    spotify_id: str | None = None
+
+    if ref.platform == "deezer":
+        deezer_id = ref.id
+        detail = (await client.get(f"https://api.deezer.com/artist/{ref.id}")).json()
+        name = detail.get("name")
+    elif ref.platform == "spotify":
+        spotify_id = ref.id
+        token = await spotify.get_token(client)
+        r = await client.get(f"{spotify.API}/artists/{ref.id}",
+                             headers={"Authorization": f"Bearer {token}"})
+        if r.status_code == 200:
+            name = r.json().get("name")
+    elif ref.platform == "youtube":
+        name = await _youtube_title(ref, client)
+    elif ref.platform in ("lastfm", "apple", "musicbrainz"):
+        # These carry no name we can read back cheaply except Last.fm, whose
+        # URL segment is the name itself.
+        name = ref.id if ref.platform == "lastfm" else None
+
+    if not name:
+        raise ValueError(f"could not read an artist name from {ref.describe()}")
+
+    if deezer_id is None:
+        hits = await deezer.search_artists(client, name, limit=5)
+        exact = [a for a in hits if normalize(a["name"]) == normalize(name)]
+        if pick := (exact or hits):
+            deezer_id = str(pick[0]["id"])
+            # YouTube titles are whatever the artist typed -- one channel is
+            # literally "susanacala". Music platforms carry the billed name, so
+            # prefer theirs once the same artist is confirmed on both.
+            if ref.platform == "youtube" and normalize(pick[0]["name"]) != normalize(name):
+                if normalize(name).replace(" ", "") == normalize(pick[0]["name"]).replace(" ", ""):
+                    name = pick[0]["name"]
+    if spotify_id is None:
+        try:
+            found = await spotify.search_artists(client, name, limit=5)
+            exact = [a for a in found if normalize(a["name"]) == normalize(name)]
+            if pick := (exact or found):
+                spotify_id = pick[0]["id"]
+        except Exception:
+            spotify_id = None
+
+    return Identity(
+        resolved_name=name,
+        spotify_id=spotify_id,
+        deezer_id=deezer_id,
+        # The link identified the artist; nothing was ranked or guessed.
+        disambiguation_confidence=Confidence.HIGH,
+        alternates_considered=[f"resolved from {ref.describe()} — no ranking applied"],
+    )
+
+
+async def _youtube_title(ref: PlatformRef, client: httpx.AsyncClient) -> str | None:
+    key = os.getenv("YOUTUBE_API_KEY")
+    if not key:
+        return None
+    params = {"key": key, "part": "snippet"}
+    params["id" if ref.kind == "channel" else "forHandle"] = (
+        ref.id if ref.kind == "channel" else f"@{ref.id}"
+    )
+    r = await client.get("https://www.googleapis.com/youtube/v3/channels", params=params)
+    if r.status_code != 200:
+        return None
+    items = r.json().get("items", [])
+    title = items[0]["snippet"]["title"] if items else None
+    # "Artist - Topic" channels name the artist in the title; strip the suffix.
+    return title.rsplit(" - Topic", 1)[0].strip() if title else None

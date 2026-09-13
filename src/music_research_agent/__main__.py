@@ -19,6 +19,7 @@ from .analysis.engine import AnalysisEngine, SECTIONS
 from .assemble import Assembler
 from .collect import collect
 from .render import render
+from .search import search_artists
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -26,7 +27,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         prog="music_research_agent",
         description="Produce a source-cited A&R screening report on an emerging artist.",
     )
-    p.add_argument("artist", help="Artist name to research")
+    p.add_argument("artist",
+                   help="Artist name, or a pasted profile URL (Spotify, Deezer, "
+                        "YouTube, Apple Music, Last.fm, MusicBrainz)")
+    p.add_argument("--search", action="store_true",
+                   help="List matching artists instead of researching one")
     p.add_argument("--spotify-id", help="Skip resolution and use this Spotify artist ID")
     p.add_argument("--out", type=Path, default=Path("runs"), help="Output directory")
     p.add_argument("--no-cache", action="store_true",
@@ -36,7 +41,22 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return p.parse_args(argv)
 
 
+async def run_search(query: str) -> int:
+    hits = await search_artists(query, limit=10)
+    if not hits:
+        print(f"No artist matched {query!r}", file=sys.stderr)
+        return 1
+    print(f"{len(hits)} match(es) — pass a URL to research one without ambiguity:\n")
+    for hit in hits:
+        print(f"  {hit.label()}")
+        print(f"      {hit.link or 'https://www.deezer.com/artist/' + hit.deezer_id}")
+    return 0
+
+
 async def run(args: argparse.Namespace) -> int:
+    if args.search:
+        return await run_search(args.artist)
+
     started = time.time()
     run_id = uuid.uuid4().hex[:12]
 
@@ -89,7 +109,16 @@ async def run(args: argparse.Namespace) -> int:
 
 def main() -> int:
     load_dotenv()
-    return asyncio.run(run(parse_args()))
+    try:
+        return asyncio.run(run(parse_args()))
+    except ValueError as exc:
+        # Bad input is the user's to fix, not a crash to debug: print what is
+        # wrong and what to do instead, without a stack trace in the way.
+        print(f"\n{exc}", file=sys.stderr)
+        return 1
+    except KeyboardInterrupt:
+        print("\nInterrupted.", file=sys.stderr)
+        return 130
 
 
 if __name__ == "__main__":
