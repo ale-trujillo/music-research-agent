@@ -141,7 +141,11 @@ def render(r: ArtistReport) -> str:
             for x in rows:
                 add(f"| {x.market} | {MARK[x.strength]} | {x.evidence_type} |")
     if m.touring_footprint:
-        add(f"\n**Touring:** {', '.join(m.touring_footprint)}")
+        # Joining these with a comma produced "...returned., Acoustic-led..."
+        # -- the model writes whole sentences here, not place names.
+        add("\n**Touring**\n")
+        for note in m.touring_footprint:
+            add(f"- {note}")
     add("")
 
     a = r.recent_activity

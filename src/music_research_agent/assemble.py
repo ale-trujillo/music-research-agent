@@ -199,7 +199,10 @@ STOPWORDS = frozenset(
     "the a an and or of for to in on at is are was were no not any all with "
     "this that these those there here it its as by from than then so but".split()
 )
-OVERLAP_THRESHOLD = 0.6
+# 0.40 measured against real reports: it collapses the same caveat written
+# twice in different vocabulary without merging genuinely distinct points.
+# Anything above 0.45 left obvious duplicates standing.
+OVERLAP_THRESHOLD = 0.40
 
 
 def dedupe_caveats(caveats: list[str], limit: int = 10) -> list[str]:
