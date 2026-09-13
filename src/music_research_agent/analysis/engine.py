@@ -50,6 +50,13 @@ is a different prospect from one with both; say which you are looking at.
 hundred listeners, and saying so is more useful than flattery.
 - Write for an A&R reader deciding whether to take a meeting. Be concrete.
 
+A source that was queried and returned nothing appears as `source_status.<name>`. Cite it like any other evidence. A missing platform is an established fact about this artist's file, not a guess.
+
+Length discipline. This is a screening document -- it has to be readable in two minutes or it will not be read at all:
+- One idea per bullet, under 45 words. No preamble, no restating the question.
+- At most 5 green flags, 5 risks, 4 caveats per section. Choose the strongest; a long list of near-duplicates reads as padding and buries what matters.
+- Never repeat a point you have already made in this section.
+
 EVIDENCE
 ========
 {evidence}"""
