@@ -3,7 +3,24 @@
 Probed against the golden set on 2026-09-12. Re-run before trusting any row:
 these are third-party APIs and they move.
 
-## Spotify — identity and discography only
+## Spotify — identity anchor only (demoted 2026-09-13)
+
+Spotify is no longer in the collection fan-out. Its remaining contribution was a
+dated discography, and Deezer returns the identical list — 33 releases with
+titles, dates and formats — in one unauthenticated call with no quota, where
+Spotify needed four paginated calls against an allowance that locks out for
+about 22 hours once spent (`retry-after: 79893`).
+
+**Extended quota is not available to a tool like this.** Since 15 May 2025
+Spotify accepts requests only from registered companies with a launched service
+and **250,000+ monthly active users**. Research and internal tooling do not
+qualify, so the constraint is permanent and the fix had to be spending less
+rather than asking for more.
+
+It remains the identity anchor in `resolve()`: one search per run, for the
+canonical artist ID and profile link.
+
+### What it returned while it was in the fan-out
 
 App created under the post-2024 restricted regime for new apps.
 
@@ -94,7 +111,7 @@ signal, not missing data.
 | Audience size | Spotify `followers` ❌ | **Deezer `nb_fan`** + Last.fm listeners + YouTube subs |
 | Popularity | Spotify `popularity` ❌ | Deezer `nb_fan` as proxy |
 | Genre | Spotify `genres` ❌ | **Last.fm tags** |
-| Discography / recent activity | Spotify albums | Spotify albums ✅ + Deezer albums ✅ |
+| Discography / recent activity | Spotify albums | **Deezer albums** — one call, no quota |
 | Top tracks | Spotify `top-tracks` ❌ | **Deezer `/top`** ✅ |
 | Comparables | Spotify `related-artists` ❌ | **Last.fm `artist.getSimilar`** |
 

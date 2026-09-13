@@ -29,6 +29,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("artist", help="Artist name to research")
     p.add_argument("--spotify-id", help="Skip resolution and use this Spotify artist ID")
     p.add_argument("--out", type=Path, default=Path("runs"), help="Output directory")
+    p.add_argument("--no-cache", action="store_true",
+                   help="Re-query every source instead of reusing today's cached evidence")
     p.add_argument("--raw", action="store_true",
                    help="Collect evidence only; skip analysis and skip all model cost")
     return p.parse_args(argv)
@@ -39,7 +41,7 @@ async def run(args: argparse.Namespace) -> int:
     run_id = uuid.uuid4().hex[:12]
 
     print(f"Resolving and collecting: {args.artist}", file=sys.stderr)
-    bundle = await collect(args.artist, args.spotify_id)
+    bundle = await collect(args.artist, args.spotify_id, use_cache=not args.no_cache)
     identity = bundle.identity
 
     print(f"  -> {identity.resolved_name} "

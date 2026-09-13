@@ -26,7 +26,7 @@ in the stack bills nothing.
 |---|---|---|
 | Deezer | none | Strongest source here. Audience size and genre |
 | MusicBrainz | none | User-Agent only |
-| Spotify | Client ID + Secret | developer.spotify.com/dashboard |
+| Spotify | Client ID + Secret | Identity anchor only — one search per run |
 | Last.fm | API key | last.fm/api/account/create |
 | YouTube | API key | console.cloud.google.com, 10,000 units/day |
 
@@ -72,12 +72,20 @@ the report shipped with a figure no source returned; exit code is 2.
 
 ## Known constraints
 
-- **Spotify apps created under the current regime** return an artist object with
-  no followers, popularity, or genres, and 403 on batch lookup, top-tracks and
-  related-artists. It is an identity anchor and discography source only. Album
-  `limit` is hard-capped at 10; offset paging works.
-- **Spotify rate limits are unforgiving in development mode.** Exhausting the
-  daily allowance returns `retry-after` of roughly 22 hours.
+- **Spotify is an identity anchor and nothing more.** Apps created under the
+  current regime return an artist object with no followers, popularity or
+  genres, and 403 on batch lookup, top-tracks and related-artists. The
+  discography it could still serve costs four paginated calls (album `limit` is
+  capped at 10) against an allowance that returns `retry-after` of roughly 22
+  hours once spent. Deezer returns the same discography in one unauthenticated
+  call, so Spotify was taken out of the fan-out.
+- **Extended quota mode cannot fix this.** Since 15 May 2025 Spotify grants it
+  only to registered companies with a launched service and 250,000+ monthly
+  active users. A research tool will not qualify; plan around the limit.
+- **Evidence is cached to disk** (`.cache/`, 24h for complete runs, 1h for runs
+  where a source failed). Iterating on prompts re-collects the same artist
+  repeatedly, which is how this project spent its own Spotify allowance.
+  `--no-cache` forces a re-query.
 - **YouTube** costs ~105 quota units per artist against 10,000/day — about 95
   artists. `search.list` costs 100 and `playlistItems.list` costs 1, which is
   why channel uploads are read from the playlist rather than searched.

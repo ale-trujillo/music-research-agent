@@ -57,6 +57,19 @@ class DeezerAdapter(SourceAdapter):
                 key="deezer.latest_release", value=dated[0],
                 confidence=Confidence.HIGH, citation=self.cite(link),
             ))
+            # Titles and formats, which Spotify used to supply at the cost of
+            # four paginated calls against a quota that locks out for a day.
+            # Deezer returns the whole discography in the call already made.
+            titled = sorted(
+                ((a["release_date"], a.get("title", "?"), a.get("record_type", "release"))
+                 for a in albums if a.get("release_date")),
+                reverse=True,
+            )
+            for i, (when, title, kind) in enumerate(titled[:8], 1):
+                out.append(Evidence(
+                    key=f"deezer.recent_release.{i}", value=f"{when} — {title} ({kind})",
+                    confidence=Confidence.HIGH, citation=self.cite(link),
+                ))
             out.append(Evidence(
                 key="deezer.releases_last_12mo",
                 value=sum(1 for d in dated if d >= _year_ago(dated[0])),

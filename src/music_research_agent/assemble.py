@@ -12,6 +12,7 @@ import re
 from datetime import UTC, datetime
 
 from .analysis.drafts import ClaimDraft
+from .collect import SOURCE_COUNT
 from .evidence import EvidenceBundle
 from .schema import (
     ActivityEvent,
@@ -184,7 +185,7 @@ class Assembler:
             markets=markets, recent_activity=recent, signals=signals,
             ar_summary=ar_summary,
             data_quality=DataQuality(
-                coverage_score=self.bundle.coverage_score(4),
+                coverage_score=self.bundle.coverage_score(SOURCE_COUNT),
                 sources_used=self.bundle.sources_used,
                 sources_failed=[f"{f.source}: {f.reason}" for f in self.bundle.sources_failed],
                 fields_absent=absent,

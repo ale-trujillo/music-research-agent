@@ -7,3 +7,4 @@ runs/
 venv/
 GOLDEN_SET.md
 .DS_Store
+.cache/
