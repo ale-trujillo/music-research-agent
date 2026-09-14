@@ -13,13 +13,16 @@ import time
 import uuid
 from pathlib import Path
 
+import httpx
 from dotenv import load_dotenv
 
 from .analysis.engine import AnalysisEngine, SECTIONS
 from .assemble import Assembler
 from .collect import collect
 from .render import render
+from .discover import expand
 from .search import search_artists
+from .triage import triage
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -27,18 +30,52 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         prog="music_research_agent",
         description="Produce a source-cited A&R screening report on an emerging artist.",
     )
-    p.add_argument("artist",
+    p.add_argument("artist", nargs="?", default=None,
                    help="Artist name, or a pasted profile URL (Spotify, Deezer, "
                         "YouTube, Apple Music, Last.fm, MusicBrainz)")
     p.add_argument("--search", action="store_true",
                    help="List matching artists instead of researching one")
+    p.add_argument("--discover", nargs="+", metavar="SEED",
+                   help="Grow a ranked candidate pool from seed artists and stop. "
+                        "Costs nothing: expansion and triage use only free APIs")
+    p.add_argument("--top", type=int, default=15,
+                   help="How many triaged candidates to print (default 15)")
     p.add_argument("--spotify-id", help="Skip resolution and use this Spotify artist ID")
     p.add_argument("--out", type=Path, default=Path("runs"), help="Output directory")
     p.add_argument("--no-cache", action="store_true",
                    help="Re-query every source instead of reusing today's cached evidence")
     p.add_argument("--raw", action="store_true",
                    help="Collect evidence only; skip analysis and skip all model cost")
-    return p.parse_args(argv)
+    parsed = p.parse_args(argv)
+    if not parsed.artist and not parsed.discover:
+        p.error("give an artist name or URL, or use --discover with seed artists")
+    return parsed
+
+
+async def run_discover(seeds: list[str], top: int) -> int:
+    """Expand seeds into candidates and rank them, without spending anything."""
+    async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
+        print(f"Expanding {len(seeds)} seed(s) across both discovery graphs", file=sys.stderr)
+        candidates = await expand(seeds, client)
+        if not candidates:
+            print("No candidates in the seeds' league. Try a seed with more neighbours.",
+                  file=sys.stderr)
+            return 1
+        print(f"  -> {len(candidates)} candidates in tier; triaging", file=sys.stderr)
+        ranked = await triage(candidates, client)
+
+    print(f"\n{len(ranked)} candidates ranked — expansion and triage cost nothing\n")
+    print(f"{'artist':<26}{'score':>6}  {'fans':>8} {'listeners':>10}  activity   depth")
+    print("-" * 88)
+    for entry in ranked[:top]:
+        print(entry.line())
+    print(f"\nTop reasons:")
+    for entry in ranked[:3]:
+        print(f"  {entry.name}: {'; '.join(entry.reasons[:2])}")
+    print(f"\nReporting the top 10 costs about ${10 * 0.33:.2f}; "
+          f"all {len(ranked)} would cost ${len(ranked) * 0.33:.2f}.")
+    print("Research one with:  python -m music_research_agent \"<name or URL>\"")
+    return 0
 
 
 async def run_search(query: str) -> int:
@@ -54,6 +91,8 @@ async def run_search(query: str) -> int:
 
 
 async def run(args: argparse.Namespace) -> int:
+    if args.discover:
+        return await run_discover(args.discover, args.top)
     if args.search:
         return await run_search(args.artist)
 
