@@ -22,6 +22,7 @@ from .collect import collect
 from .render import render
 from .discover import expand
 from .search import search_artists
+from .store import JsonFileStore
 from .triage import triage
 
 
@@ -38,6 +39,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--discover", nargs="+", metavar="SEED",
                    help="Grow a ranked candidate pool from seed artists and stop. "
                         "Costs nothing: expansion and triage use only free APIs")
+    p.add_argument("--save", action="store_true",
+                   help="Save this artist to favorites, capturing today's figures. "
+                        "Saving again later turns the snapshot into a trend")
+    p.add_argument("--note", help="Note to attach when saving")
+    p.add_argument("--favorites", action="store_true",
+                   help="List saved artists and how their figures have moved")
+    p.add_argument("--forget", metavar="NAME", help="Remove an artist from favorites")
+    p.add_argument("--from-favorites", action="store_true",
+                   help="Use saved artists as discovery seeds")
     p.add_argument("--top", type=int, default=15,
                    help="How many triaged candidates to print (default 15)")
     p.add_argument("--spotify-id", help="Skip resolution and use this Spotify artist ID")
@@ -47,9 +57,37 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--raw", action="store_true",
                    help="Collect evidence only; skip analysis and skip all model cost")
     parsed = p.parse_args(argv)
-    if not parsed.artist and not parsed.discover:
-        p.error("give an artist name or URL, or use --discover with seed artists")
+    standalone = parsed.discover or parsed.favorites or parsed.forget or parsed.from_favorites
+    if not parsed.artist and not standalone:
+        p.error("give an artist name or URL, or use --discover / --favorites")
     return parsed
+
+
+def run_favorites() -> int:
+    favorites = JsonFileStore().load()
+    if not favorites:
+        print("No saved artists yet. Add one with --save.", file=sys.stderr)
+        return 1
+    print(f"{len(favorites)} saved artist(s)\n")
+    for favorite in favorites:
+        latest = favorite.latest()
+        headline = " · ".join(
+            f"{key.split('.')[-1]} {value:,}"
+            for key, value in latest.items()
+            if key in ("deezer.fans", "lastfm.listeners", "youtube.subscribers")
+        )
+        print(f"  {favorite.name}  —  {headline or 'no figures captured'}")
+        if favorite.note:
+            print(f"      note: {favorite.note}")
+        movement = favorite.movement()
+        if movement:
+            print(f"      over {favorite.days_tracked()} days:")
+            for metric, (before, after, percent) in movement.items():
+                if percent:
+                    print(f"        {metric:<22}{before:>11,} -> {after:>11,}  {percent:+.1f}%")
+        else:
+            print(f"      captured once — save again later to see movement")
+    return 0
 
 
 async def run_discover(seeds: list[str], top: int) -> int:
@@ -91,6 +129,19 @@ async def run_search(query: str) -> int:
 
 
 async def run(args: argparse.Namespace) -> int:
+    if args.favorites:
+        return run_favorites()
+    if args.forget:
+        removed = JsonFileStore().remove(args.forget)
+        print("Removed." if removed else f"No saved artist matched {args.forget!r}",
+              file=sys.stderr)
+        return 0 if removed else 1
+    if args.from_favorites:
+        seeds = JsonFileStore().seeds()
+        if not seeds:
+            print("No saved artists to seed from. Add some with --save.", file=sys.stderr)
+            return 1
+        return await run_discover(seeds, args.top)
     if args.discover:
         return await run_discover(args.discover, args.top)
     if args.search:
@@ -112,6 +163,11 @@ async def run(args: argparse.Namespace) -> int:
 
     out_dir = args.out / (identity.deezer_id or identity.spotify_id or run_id) / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    if args.save:
+        favorite = JsonFileStore().add(bundle, note=args.note)
+        print(f"  saved to favorites ({len(favorite.readings)} reading(s) recorded)",
+              file=sys.stderr)
 
     if args.raw:
         path = out_dir / "evidence.json"
