@@ -1,0 +1,1740 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-09-14T00:30:16.170209Z",
+  "run_id": "a7a35536e29d",
+  "duration_s": 69.2,
+  "cost_usd": 0.4273,
+  "identity": {
+    "resolved_name": "Ela Taubert",
+    "spotify_id": "5xS8cfsAaFyy188dNJGDbM",
+    "deezer_id": "65501282",
+    "musicbrainz_id": null,
+    "origin_country": null,
+    "origin_city": null,
+    "active_since": null,
+    "label_status": null,
+    "disambiguation_confidence": "high",
+    "alternates_considered": [
+      "Ryan Taubert (deezer, 1166 fans)",
+      "Gilbert Bécaud (deezer, 129550 fans)",
+      "Juliana (spotify)",
+      "AGUDELO888 (spotify)",
+      "Tainy (spotify)",
+      "Taiu (spotify)"
+    ]
+  },
+  "snapshot": {
+    "confidence": "high",
+    "evidence_basis": "47 data points from deezer, lastfm, youtube",
+    "caveats": [],
+    "metrics": [
+      {
+        "name": "deezer.fans",
+        "value": 5858,
+        "unit": "fans",
+        "confidence": "high",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.161747Z",
+          "note": "stands in for Spotify popularity, which the API no longer exposes"
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "deezer.release_count",
+        "value": 31,
+        "unit": "releases",
+        "confidence": "high",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.162064Z",
+          "note": null
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "deezer.releases_last_12mo",
+        "value": 6,
+        "unit": "releases",
+        "confidence": "medium",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470558Z",
+          "note": "counted from dated releases"
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "deezer.related.Joaquina",
+        "value": 1468,
+        "unit": "fans",
+        "confidence": "low",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:10.473687Z",
+          "note": "Deezer related skews to much larger artists"
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "deezer.related.TIMØ",
+        "value": 5065,
+        "unit": "fans",
+        "confidence": "low",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:10.473773Z",
+          "note": "Deezer related skews to much larger artists"
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "deezer.related.Aitana",
+        "value": 348001,
+        "unit": "fans",
+        "confidence": "low",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:10.473784Z",
+          "note": "Deezer related skews to much larger artists"
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "deezer.related.Sebastian Yatra",
+        "value": 2377720,
+        "unit": "fans",
+        "confidence": "low",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:10.473792Z",
+          "note": "Deezer related skews to much larger artists"
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "deezer.related.Elena Rose",
+        "value": 6226,
+        "unit": "fans",
+        "confidence": "low",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:10.473801Z",
+          "note": "Deezer related skews to much larger artists"
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "deezer.related.Mafalda Cardenal",
+        "value": 1554,
+        "unit": "fans",
+        "confidence": "low",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:10.473809Z",
+          "note": "Deezer related skews to much larger artists"
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "deezer.related.Morat",
+        "value": 1095701,
+        "unit": "fans",
+        "confidence": "low",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:10.473819Z",
+          "note": "Deezer related skews to much larger artists"
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "deezer.related.Yami Safdie",
+        "value": 5473,
+        "unit": "fans",
+        "confidence": "low",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:10.473829Z",
+          "note": "Deezer related skews to much larger artists"
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "lastfm.listeners",
+        "value": 71087,
+        "unit": "listeners",
+        "confidence": "high",
+        "citation": {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.280317Z",
+          "note": null
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "lastfm.playcount",
+        "value": 1562506,
+        "unit": "plays",
+        "confidence": "high",
+        "citation": {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.280391Z",
+          "note": null
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "lastfm.similar.Ventino",
+        "value": 1.0,
+        "unit": null,
+        "confidence": "low",
+        "citation": {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.492038Z",
+          "note": "match=1.0 on a small audience is a co-listening artifact"
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "lastfm.similar.Sebastián Yatra",
+        "value": 0.614,
+        "unit": null,
+        "confidence": "medium",
+        "citation": {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.492094Z",
+          "note": null
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "lastfm.similar.Sebastian Yatra",
+        "value": 0.58,
+        "unit": null,
+        "confidence": "medium",
+        "citation": {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.492109Z",
+          "note": null
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "lastfm.similar.Cali & El Dandee",
+        "value": 0.551,
+        "unit": null,
+        "confidence": "medium",
+        "citation": {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.492118Z",
+          "note": null
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "lastfm.similar.Camilo",
+        "value": 0.516,
+        "unit": null,
+        "confidence": "medium",
+        "citation": {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.492126Z",
+          "note": null
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "lastfm.similar.Fanny Lú",
+        "value": 0.514,
+        "unit": null,
+        "confidence": "medium",
+        "citation": {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.492135Z",
+          "note": null
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "lastfm.similar.Danna Paola",
+        "value": 0.468,
+        "unit": null,
+        "confidence": "medium",
+        "citation": {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.492144Z",
+          "note": null
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "lastfm.similar.Elena Rose",
+        "value": 0.441,
+        "unit": null,
+        "confidence": "medium",
+        "citation": {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.492163Z",
+          "note": null
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "youtube.subscribers",
+        "value": 575000,
+        "unit": "subscribers",
+        "confidence": "high",
+        "citation": {
+          "source": "youtube",
+          "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+          "retrieved_at": "2026-09-14T00:29:12.525986Z",
+          "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "youtube.total_views",
+        "value": 492216352,
+        "unit": "views",
+        "confidence": "high",
+        "citation": {
+          "source": "youtube",
+          "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+          "retrieved_at": "2026-09-14T00:29:12.525997Z",
+          "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+        },
+        "missing_reason": null
+      },
+      {
+        "name": "youtube.video_count",
+        "value": 134,
+        "unit": "videos",
+        "confidence": "high",
+        "citation": {
+          "source": "youtube",
+          "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+          "retrieved_at": "2026-09-14T00:29:12.526005Z",
+          "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+        },
+        "missing_reason": null
+      }
+    ]
+  },
+  "audience_shape": {
+    "confidence": "high",
+    "evidence_basis": "headline figures from Deezer, Last.fm, YouTube; Spotify and Apple Music unobserved",
+    "caveats": [
+      "No total is given because these figures measure different things — follows, sampled listeners, scrobbles and video views — and adding them would produce a number with no referent. Real cross-platform stream totals exist only in the artist's own distributor reporting or in licensed industry data.",
+      "Spotify and Apple Music carry most streaming in this market and expose no public audience figures. The streaming side here is Deezer and Last.fm, both minor in Colombia, so a video-led shape may describe what is measurable rather than where the audience is. Treat it as a question to put to the artist, not a conclusion."
+    ],
+    "signals": [
+      {
+        "platform": "Deezer",
+        "metric": "deezer.fans",
+        "value": 5858,
+        "unit": "follows",
+        "measures": "people who saved the artist, not plays",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.161747Z",
+          "note": "stands in for Spotify popularity, which the API no longer exposes"
+        }
+      },
+      {
+        "platform": "Last.fm",
+        "metric": "lastfm.listeners",
+        "value": 71087,
+        "unit": "listeners",
+        "measures": "distinct Last.fm users only — a small, non-representative sample",
+        "citation": {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.280317Z",
+          "note": null
+        }
+      },
+      {
+        "platform": "Last.fm",
+        "metric": "lastfm.playcount",
+        "value": 1562506,
+        "unit": "plays",
+        "measures": "scrobbles from Last.fm users only",
+        "citation": {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.280391Z",
+          "note": null
+        }
+      },
+      {
+        "platform": "YouTube",
+        "metric": "youtube.subscribers",
+        "value": 575000,
+        "unit": "subscribers",
+        "measures": "channel follows",
+        "citation": {
+          "source": "youtube",
+          "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+          "retrieved_at": "2026-09-14T00:29:12.525986Z",
+          "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+        }
+      },
+      {
+        "platform": "YouTube",
+        "metric": "youtube.total_views",
+        "value": 492216352,
+        "unit": "views",
+        "measures": "lifetime video views, undated, music and non-music alike",
+        "citation": {
+          "source": "youtube",
+          "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+          "retrieved_at": "2026-09-14T00:29:12.525997Z",
+          "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+        }
+      },
+      {
+        "platform": "YouTube",
+        "metric": "youtube.video_count",
+        "value": 134,
+        "unit": "videos",
+        "measures": "uploads on the artist channel",
+        "citation": {
+          "source": "youtube",
+          "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+          "retrieved_at": "2026-09-14T00:29:12.526005Z",
+          "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+        }
+      },
+      {
+        "platform": "Deezer",
+        "metric": "deezer.release_count",
+        "value": 31,
+        "unit": "releases",
+        "measures": "catalogue size",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.162064Z",
+          "note": null
+        }
+      }
+    ],
+    "ratios": [
+      {
+        "name": "plays per Last.fm listener",
+        "value": 22.0,
+        "derived_from": [
+          "lastfm.playcount",
+          "lastfm.listeners"
+        ],
+        "reads_as": "returns to the catalogue rather than sampling it once",
+        "citations": [
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280391Z",
+            "note": null
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280317Z",
+            "note": null
+          }
+        ]
+      },
+      {
+        "name": "views per video",
+        "value": 3673256.4,
+        "derived_from": [
+          "youtube.total_views",
+          "youtube.video_count"
+        ],
+        "reads_as": "averages 3,673,256 views an upload; says nothing about spread across them",
+        "citations": [
+          {
+            "source": "youtube",
+            "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+            "retrieved_at": "2026-09-14T00:29:12.525997Z",
+            "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+          },
+          {
+            "source": "youtube",
+            "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+            "retrieved_at": "2026-09-14T00:29:12.526005Z",
+            "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+          }
+        ]
+      },
+      {
+        "name": "Deezer follows per release",
+        "value": 189.0,
+        "derived_from": [
+          "deezer.fans",
+          "deezer.release_count"
+        ],
+        "reads_as": "catalogue is converting on Deezer",
+        "citations": [
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:08.161747Z",
+            "note": "stands in for Spotify popularity, which the API no longer exposes"
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:08.162064Z",
+            "note": null
+          }
+        ]
+      }
+    ],
+    "profile": "comparable on video and measured streaming",
+    "notes": [
+      "492,216,352 lifetime views against 76,945 followers and listeners on measurable platforms. The traffic-source and geography breakdown is what separates real demand from paid or incidental views, and it is not public.",
+      "22.0 plays per listener: small audience, but it returns."
+    ],
+    "unobserved": [
+      "Spotify",
+      "Apple Music"
+    ]
+  },
+  "positioning": {
+    "confidence": "medium",
+    "evidence_basis": "Deezer artist page (31 releases, 6 in last 12 months, genre and top tracks), Last.fm listener/tag/similar data, and a confirmed YouTube artist channel plus Topic catalogue. No Spotify, Instagram, TikTok, press or live data in file.",
+    "caveats": [
+      "No Spotify, social or press evidence in file; audience read rests on YouTube and Last.fm only.",
+      "Scale is uneven and unexplained: 575,000 YouTube subscribers against 5,858 Deezer fans — platform mix, not necessarily true reach.",
+      "Sonic descriptors are inferred from titles, genre tags and similar-artist lists; no audio or production credits were available.",
+      "Deezer 'related' list mixes 1,000-fan peers with Yatra and Morat; treat it as algorithmic adjacency, not peer level."
+    ],
+    "genre_primary": "Latin pop",
+    "genre_secondary": [
+      "Pop",
+      "Spanish-language singer-songwriter pop"
+    ],
+    "sonic_descriptors": [
+      "ballad-leaning, confessional vocal pop",
+      "female lead vocal front and centre",
+      "breakup-narrative lyricism (titles are questions and answers)",
+      "mainstream-radio Latin pop production, not urbano"
+    ],
+    "scene": "Bogotá / Colombian mainstream Latin pop, tagged by listeners as 'Latin Pop Girls' alongside Ventino, Yatra, Camilo and Cali & El Dandee",
+    "narrative": {
+      "text": "The catalogue is built as an explicit call-and-response breakup arc: 'QUIERO OLVIDARTE (Respuesta #1)', 'NO SUPISTE CUIDARNOS (Respuesta #2)', 'RESPUESTAS A LAS 11:11', 'TE PROMETO (el fin de una era)' — a numbered serialised emotional storyline rather than standalone singles.",
+      "confidence": "high",
+      "citations": [
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470496Z",
+          "note": null
+        },
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470503Z",
+          "note": null
+        },
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470509Z",
+          "note": null
+        },
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470515Z",
+          "note": null
+        }
+      ]
+    },
+    "audience_profile": {
+      "text": "Young Spanish-speaking pop audience, heavily video-first: 575,000 YouTube subscribers and 492,216,352 views versus only 5,858 Deezer fans. Last.fm shows 71,087 listeners and 1,562,506 plays, tagged pop / Colombia / female vocalists / bogota.",
+      "confidence": "high",
+      "citations": [
+        {
+          "source": "youtube",
+          "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+          "retrieved_at": "2026-09-14T00:29:12.525986Z",
+          "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+        },
+        {
+          "source": "youtube",
+          "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+          "retrieved_at": "2026-09-14T00:29:12.525997Z",
+          "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+        },
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.161747Z",
+          "note": "stands in for Spotify popularity, which the API no longer exposes"
+        },
+        {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.280317Z",
+          "note": null
+        },
+        {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.280391Z",
+          "note": null
+        },
+        {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.280433Z",
+          "note": "user-supplied tag"
+        },
+        {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.280446Z",
+          "note": "user-supplied tag"
+        },
+        {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.280456Z",
+          "note": "user-supplied tag"
+        }
+      ]
+    },
+    "differentiation": {
+      "text": "Unlike most acts at this file size, there is a documented major-name feature: '¿Cómo Pasó? (Con Joe Jonas)' sits in the Deezer top five alongside the solo original, indicating a crossover push. Inference: that track, not the recent singles, anchors the catalogue.",
+      "confidence": "medium",
+      "citations": [
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:10.282954Z",
+          "note": null
+        },
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:10.283034Z",
+          "note": null
+        }
+      ]
+    }
+  },
+  "comparables": {
+    "confidence": "medium",
+    "evidence_basis": "Three sources only: Deezer (5858 fans, 31 releases, 8 related artists with fan counts), Last.fm (71087 listeners, 1562506 plays, tags and 8 similar artists), and YouTube (575000 subscribers, 492216352 views, 134 videos). Tier peers were selected on the single comparable number available — Deezer fan counts — and cross-checked against Last.fm similarity where both existed. Aitana, Yatra and Morat were excluded from peers as 60x-400x Ela's Deezer count and moved to analogs.",
+    "caveats": [
+      "The peer set is built on Deezer fans (5858), but YouTube shows 575000 subscribers and 492216352 views. If the YouTube figure is the truer scale, these 'peers' sit well below Ela and the tier read is wrong.",
+      "Ventino is Ela's top Last.fm similar at 1.0 but carries no audience figure anywhere in the file, so it cannot be sized or assigned to either group.",
+      "No Spotify, Instagram or TikTok evidence appears in the file, and no source_status rows record those queries — the absence is unexplained rather than confirmed empty.",
+      "No trajectory analog has dated history in the evidence; every 'what happened next' is inference from a single current fan count."
+    ],
+    "tier_peers": [
+      {
+        "artist": "Elena Rose",
+        "why": "The only name corroborated by two independent sources: she sits in Ela's Deezer related list at 6226 fans (Ela: 5858) and in Last.fm's similar list at 0.441. Same order of magnitude on the one size metric both artists share.",
+        "shared_signals": [
+          "Deezer fan count within ~400 of Ela's",
+          "appears in both Deezer related and Last.fm similar",
+          "Latin pop / female-vocalist lane (inferred from lastfm tags, not stated for Elena Rose)"
+        ],
+        "confidence": "medium",
+        "citations": [
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.473801Z",
+            "note": "Deezer related skews to much larger artists"
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.492163Z",
+            "note": null
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:08.161747Z",
+            "note": "stands in for Spotify popularity, which the API no longer exposes"
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280446Z",
+            "note": "user-supplied tag"
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280415Z",
+            "note": "user-supplied tag"
+          }
+        ]
+      },
+      {
+        "artist": "Yami Safdie",
+        "why": "5473 Deezer fans against Ela's 5858 — the closest numeric match in the file. Corroboration is thin: co-recommendation on Deezer only, with no Last.fm or tag overlap to confirm shared sound rather than shared listeners.",
+        "shared_signals": [
+          "Deezer fans within ~400",
+          "co-recommended on Ela's Deezer artist page",
+          "Deezer Pop/Latino genre context"
+        ],
+        "confidence": "medium",
+        "citations": [
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.473829Z",
+            "note": "Deezer related skews to much larger artists"
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:08.161747Z",
+            "note": "stands in for Spotify popularity, which the API no longer exposes"
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.049863Z",
+            "note": "tagged on 8 of 8 sampled releases"
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.049897Z",
+            "note": "tagged on 8 of 8 sampled releases"
+          }
+        ]
+      },
+      {
+        "artist": "TIMØ",
+        "why": "5065 Deezer fans, within 15% of Ela's 5858. Single-source signal — Deezer co-recommendation — so treat as a size benchmark rather than a sonic peer. Nothing in the file confirms genre or territory.",
+        "shared_signals": [
+          "Deezer fans in the same band as Ela's",
+          "Deezer related-artist adjacency"
+        ],
+        "confidence": "low",
+        "citations": [
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.473773Z",
+            "note": "Deezer related skews to much larger artists"
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:08.161747Z",
+            "note": "stands in for Spotify popularity, which the API no longer exposes"
+          }
+        ]
+      },
+      {
+        "artist": "Joaquina",
+        "why": "1468 Deezer fans — roughly a quarter of Ela's, so a step below rather than level. Useful as the floor of the recommendation cluster: it shows where Deezer places Ela relative to genuinely developing acts.",
+        "shared_signals": [
+          "Deezer related-artist adjacency",
+          "same Pop/Latino recommendation cluster"
+        ],
+        "confidence": "low",
+        "citations": [
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.473687Z",
+            "note": "Deezer related skews to much larger artists"
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:08.161747Z",
+            "note": "stands in for Spotify popularity, which the API no longer exposes"
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.049897Z",
+            "note": "tagged on 8 of 8 sampled releases"
+          }
+        ]
+      },
+      {
+        "artist": "Mafalda Cardenal",
+        "why": "1554 Deezer fans, the same sub-tier as Joaquina. Included only to bracket the cluster; the gap to Ela's 5858 is real and she should not be benchmarked against this level on Deezer.",
+        "shared_signals": [
+          "Deezer related-artist adjacency",
+          "Pop/Latino cluster"
+        ],
+        "confidence": "low",
+        "citations": [
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.473809Z",
+            "note": "Deezer related skews to much larger artists"
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:08.161747Z",
+            "note": "stands in for Spotify popularity, which the API no longer exposes"
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.049863Z",
+            "note": "tagged on 8 of 8 sampled releases"
+          }
+        ]
+      }
+    ],
+    "trajectory_analogs": [
+      {
+        "artist": "Sebastián Yatra",
+        "why": "The best-evidenced neighbour in the file: Deezer related at 2377720 fans plus two Last.fm similar entries (0.614 and 0.580). Colombian mainstream pop — the ceiling case for the lane Ela's tags place her in.",
+        "shared_signals": [
+          "appears in Deezer related and twice in Last.fm similar",
+          "Colombian pop tagging on Ela's Last.fm",
+          "Deezer Pop/Latino genres"
+        ],
+        "confidence": "medium",
+        "citations": [
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.473792Z",
+            "note": "Deezer related skews to much larger artists"
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.492094Z",
+            "note": null
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.492109Z",
+            "note": null
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280433Z",
+            "note": "user-supplied tag"
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280415Z",
+            "note": "user-supplied tag"
+          }
+        ],
+        "stage_matched": "Not evidenced. The file contains only his current size (2377720 Deezer fans); any claim about where he stood at Ela's stage is inference, not evidence.",
+        "what_happened_next": "Inference only: he now sits roughly 400x Ela's Deezer fan count. The file shows the destination, not the path — no dated history for him exists here."
+      },
+      {
+        "artist": "Morat",
+        "why": "Colombian pop act at 1095701 Deezer fans in Ela's related list. Same national-pop lane implied by Ela's Colombia/Bogotá tags, sized far above her — a scale reference, not a peer.",
+        "shared_signals": [
+          "Deezer related-artist adjacency",
+          "Colombia/Bogotá tagging on Ela's profile",
+          "Pop/Latino genre"
+        ],
+        "confidence": "low",
+        "citations": [
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.473819Z",
+            "note": "Deezer related skews to much larger artists"
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280433Z",
+            "note": "user-supplied tag"
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280456Z",
+            "note": "user-supplied tag"
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.049863Z",
+            "note": "tagged on 8 of 8 sampled releases"
+          }
+        ],
+        "stage_matched": "No stage data in evidence. Placement as an analog rests on genre and territory adjacency only.",
+        "what_happened_next": "Not in evidence. Current standing is 1095701 Deezer fans; the trajectory between is inference."
+      },
+      {
+        "artist": "Aitana",
+        "why": "348001 Deezer fans, in Ela's related list — the mid-rung between Ela's 5858 Deezer fans and the Yatra/Morat tier. Closest evidenced example of a female Latin-pop vocalist scaled up.",
+        "shared_signals": [
+          "Deezer related-artist adjacency",
+          "female-vocalist / Latin Pop Girls tagging on Ela (not confirmed for Aitana in file)",
+          "Pop genre"
+        ],
+        "confidence": "low",
+        "citations": [
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.473784Z",
+            "note": "Deezer related skews to much larger artists"
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280446Z",
+            "note": "user-supplied tag"
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280466Z",
+            "note": "user-supplied tag"
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:08.161747Z",
+            "note": "stands in for Spotify popularity, which the API no longer exposes"
+          }
+        ],
+        "stage_matched": "Unevidenced. Included as an intermediate size marker, not a verified career parallel.",
+        "what_happened_next": "Not in evidence. File shows only her present 348001 Deezer fans."
+      },
+      {
+        "artist": "Camilo",
+        "why": "Last.fm similar at 0.516 and Colombian. Named here because the crossover pattern in Ela's own catalogue — a top track credited '¿Cómo Pasó? (Con Joe Jonas)' — points to feature-led expansion, which is the mechanism worth interrogating in a meeting.",
+        "shared_signals": [
+          "Last.fm similarity 0.516",
+          "Colombia tag on Ela",
+          "documented high-profile feature in Ela's top tracks"
+        ],
+        "confidence": "low",
+        "citations": [
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.492126Z",
+            "note": null
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280433Z",
+            "note": "user-supplied tag"
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.283034Z",
+            "note": null
+          }
+        ],
+        "stage_matched": "No size figure for Camilo anywhere in the file, so his tier cannot be checked. Flagged as candidate only.",
+        "what_happened_next": "Unknown from evidence. No audience, release or date data for Camilo is present."
+      }
+    ]
+  },
+  "markets": {
+    "confidence": "low",
+    "evidence_basis": "Geography here rests entirely on proxies: Last.fm crowd tags (lastfm.tag.colombia, lastfm.tag.bogota) and related/similar-artist adjacency on two platforms (deezer.related.*, lastfm.similar.*). The only hard scale figures are platform-wide and country-blind: 71087 Last.fm listeners with 1562506 plays (lastfm.listeners, lastfm.playcount), 5858 Deezer fans (deezer.fans), and 575000 YouTube subscribers against 492216352 views across 134 videos (youtube.subscribers, youtube.total_views, youtube.video_count). Note the large gap between YouTube scale and Deezer fan count — that asymmetry is real in the file but cannot be resolved into territory splits.",
+    "caveats": [
+      "No free source in this file exposes listeners by country. Every market claim above is inference from tags and adjacency, not measured geography.",
+      "Related-artist edges reflect co-listening and catalogue similarity, not where fans live. Aitana's 348001 Deezer fans say nothing about this artist's Spanish audience.",
+      "The Bogotá and Colombia tags may reflect the artist's origin rather than an active local audience; tag counts are not shown.",
+      "YouTube's 492216352 views are unsegmented — they could be concentrated in one territory or spread across all Spanish-speaking markets, and this file cannot distinguish the two."
+    ],
+    "colombia_traction": [
+      {
+        "market": "Colombia (national)",
+        "strength": "medium",
+        "evidence_type": "Listener-applied genre/location tags on Last.fm — a crowd-tagging proxy, not geolocated streams",
+        "citations": [
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280433Z",
+            "note": "user-supplied tag"
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280317Z",
+            "note": null
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280391Z",
+            "note": null
+          }
+        ]
+      },
+      {
+        "market": "Bogotá",
+        "strength": "low",
+        "evidence_type": "Last.fm city tag only; a handful of taggers can create a city tag, so this indicates origin/association rather than measured local audience",
+        "citations": [
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280456Z",
+            "note": "user-supplied tag"
+          }
+        ]
+      },
+      {
+        "market": "Colombian mainstream-pop peer set",
+        "strength": "medium",
+        "evidence_type": "Algorithmic similarity to Colombian acts — proxy for sharing a Colombian listener base",
+        "citations": [
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.492038Z",
+            "note": "match=1.0 on a small audience is a co-listening artifact"
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.492094Z",
+            "note": null
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.492118Z",
+            "note": null
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.492135Z",
+            "note": null
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.492126Z",
+            "note": null
+          }
+        ]
+      }
+    ],
+    "expansion_path": [
+      {
+        "market": "Spain",
+        "strength": "medium",
+        "evidence_type": "Deezer related-artist adjacency to Spanish pop acts; Deezer indexes strongly in Spain/France, so adjacency there is a soft regional proxy",
+        "citations": [
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.473784Z",
+            "note": "Deezer related skews to much larger artists"
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.473809Z",
+            "note": "Deezer related skews to much larger artists"
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:08.161747Z",
+            "note": "stands in for Spotify popularity, which the API no longer exposes"
+          }
+        ]
+      },
+      {
+        "market": "US / English-language crossover",
+        "strength": "medium",
+        "evidence_type": "Catalogue evidence — a charting-position-free but concrete signal: a top track exists as a duet with a US pop artist",
+        "citations": [
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.283034Z",
+            "note": null
+          },
+          {
+            "source": "youtube",
+            "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+            "retrieved_at": "2026-09-14T00:29:12.525986Z",
+            "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+          },
+          {
+            "source": "youtube",
+            "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+            "retrieved_at": "2026-09-14T00:29:12.525997Z",
+            "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+          }
+        ]
+      },
+      {
+        "market": "Southern Cone (Argentina) and Venezuela",
+        "strength": "low",
+        "evidence_type": "Related-artist adjacency to Argentine and Venezuelan artists of comparable or smaller scale",
+        "citations": [
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.473829Z",
+            "note": "Deezer related skews to much larger artists"
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.473687Z",
+            "note": "Deezer related skews to much larger artists"
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.473801Z",
+            "note": "Deezer related skews to much larger artists"
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.492163Z",
+            "note": null
+          }
+        ]
+      },
+      {
+        "market": "Mexico / regional Latin pop",
+        "strength": "low",
+        "evidence_type": "Single similarity edge to a Mexican pop artist; weakest inference in this section",
+        "citations": [
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.492144Z",
+            "note": null
+          }
+        ]
+      }
+    ],
+    "touring_footprint": [
+      "No touring, live or ticketing evidence of any kind is present in this file — no dates, venues, festivals or territories. This is an absence, not a low number, and no touring source appears in the evidence at all.",
+      "Any read on live demand would have to be built from scratch: ask management directly for 2025-2026 routing and ticket counts before a meeting."
+    ]
+  },
+  "recent_activity": {
+    "confidence": "medium",
+    "evidence_basis": "Dated release timeline comes entirely from Deezer (31 releases total, 6 in the last 12 months). Audience context from Last.fm (71,087 listeners; 1,562,506 plays) and YouTube (575,000 subscribers; 492,216,352 views; 134 videos). Deezer shows 5,858 fans.",
+    "caveats": [
+      "No Spotify, Instagram, TikTok, press or touring evidence in the file — live activity, campaigns and playlist support in the last 12 months are entirely unverified.",
+      "Deezer dates are release dates only; no performance data per track, so 'top track' rankings are unranked by volume.",
+      "The Joe Jonas track is undated in the evidence and may predate the window entirely.",
+      "Deezer fan count (5,858) and YouTube/Last.fm scale diverge sharply; treat Deezer as a weak proxy for audience size here."
+    ],
+    "events": [
+      {
+        "date": "2026-09-04",
+        "type": "release",
+        "title": "\"No Tengo Remedio\" (single)",
+        "significance": "Most recent release and already a top-5 track on Deezer, suggesting new material is converting, not just accumulating.",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470468Z",
+          "note": null
+        }
+      },
+      {
+        "date": "2026-05-27",
+        "type": "release",
+        "title": "\"Hasta El Fin Del Mundo\" (single)",
+        "significance": "Maintains a roughly quarterly singles cadence; no album evidence, so the strategy reads as single-driven.",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470481Z",
+          "note": null
+        }
+      },
+      {
+        "date": "2026-03-20",
+        "type": "release",
+        "title": "\"La Gente Cambia\" (single)",
+        "significance": "Third single in a continuous run; supports the 6-releases-in-12-months figure Deezer reports.",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470489Z",
+          "note": null
+        }
+      },
+      {
+        "date": "2025-12-16",
+        "type": "release",
+        "title": "\"RESPUESTAS A LAS 11:11\" (single)",
+        "significance": "Titled as part of a 'Respuestas' sequence — inference: a themed serial rollout, which is a deliberate narrative release tactic.",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470496Z",
+          "note": null
+        }
+      },
+      {
+        "date": "2025-11-28",
+        "type": "release",
+        "title": "\"TE PROMETO (el fin de una era)\" (single)",
+        "significance": "Charts as a Deezer top-5 track, so this era's material is among her best-performing catalogue, not just the older hits.",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470503Z",
+          "note": null
+        }
+      },
+      {
+        "date": "2025-09-04",
+        "type": "release",
+        "title": "\"NO SUPISTE CUIDARNOS (Respuesta #2)\" (single)",
+        "significance": "At or just outside the 12-month window; second entry in the 'Respuesta' series begun 2025-08-15.",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470509Z",
+          "note": null
+        }
+      },
+      {
+        "date": null,
+        "type": "collaboration",
+        "title": "\"¿Cómo Pasó? (Con Joe Jonas)\" listed as a top track",
+        "significance": "Only collaboration in evidence; no release date is given, so it cannot be placed in the last 12 months. Indicates prior international-artist access.",
+        "citation": {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:10.283034Z",
+          "note": null
+        }
+      }
+    ],
+    "window_months": 12
+  },
+  "signals": {
+    "confidence": "medium",
+    "evidence_basis": "Three sources: Deezer (fans, 31 releases, cadence, top tracks, related artists), Last.fm (listeners, playcount, tags, similars) and YouTube (subscribers, views, video count, confirmed Topic and artist channels). No Spotify, social, chart, touring or revenue data.",
+    "caveats": [
+      "All figures are single-point snapshots. No growth rates, so 'steady' describes output cadence, not audience trajectory.",
+      "Deezer fan counts under-index Latin American audiences; the 5,858 figure should not be read as total reach.",
+      "Last.fm listener and play counts reflect a self-selecting scrobbling population, typically skewed away from Latin pop's core audience.",
+      "Territory breakdown is entirely absent — Colombia/Bogotá tags come from Last.fm user tagging, not from listener geography."
+    ],
+    "momentum": "steady",
+    "momentum_rationale": {
+      "text": "Six releases in the last 12 months through 2026-09-04, on a roughly 2-3 month singles cadence, against a large standing YouTube base (575,000 subscribers, 492,216,352 views). Consistent output, but no time-series data exists here to show growth or decline.",
+      "confidence": "medium",
+      "citations": [
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470558Z",
+          "note": "counted from dated releases"
+        },
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470401Z",
+          "note": null
+        },
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470468Z",
+          "note": null
+        },
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470481Z",
+          "note": null
+        },
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470489Z",
+          "note": null
+        },
+        {
+          "source": "youtube",
+          "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+          "retrieved_at": "2026-09-14T00:29:12.525986Z",
+          "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+        },
+        {
+          "source": "youtube",
+          "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+          "retrieved_at": "2026-09-14T00:29:12.525997Z",
+          "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+        }
+      ]
+    },
+    "green_flags": [
+      {
+        "text": "YouTube scale is genuinely large, not emerging-tier: 575,000 subscribers and 492,216,352 total views across 134 videos on the artist channel.",
+        "confidence": "high",
+        "citations": [
+          {
+            "source": "youtube",
+            "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+            "retrieved_at": "2026-09-14T00:29:12.525986Z",
+            "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+          },
+          {
+            "source": "youtube",
+            "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+            "retrieved_at": "2026-09-14T00:29:12.525997Z",
+            "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+          },
+          {
+            "source": "youtube",
+            "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+            "retrieved_at": "2026-09-14T00:29:12.526005Z",
+            "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+          },
+          {
+            "source": "youtube",
+            "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+            "retrieved_at": "2026-09-14T00:29:12.525975Z",
+            "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+          }
+        ]
+      },
+      {
+        "text": "Disciplined release engine: 31 releases total, 6 in the last 12 months, latest 2026-09-04. No visible gaps in the recent singles run.",
+        "confidence": "high",
+        "citations": [
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:08.162064Z",
+            "note": null
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:08.470558Z",
+            "note": "counted from dated releases"
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:08.470401Z",
+            "note": null
+          }
+        ]
+      },
+      {
+        "text": "Last.fm shows 71,087 listeners and 1,562,506 plays — a plays-per-listener ratio that implies repeat listening rather than one-off curiosity (inference from the two figures).",
+        "confidence": "medium",
+        "citations": [
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280317Z",
+            "note": null
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280391Z",
+            "note": null
+          }
+        ]
+      },
+      {
+        "text": "An international-facing collaboration exists: '¿Cómo Pasó? (Con Joe Jonas)' is a top-5 Deezer track, implying label or management infrastructure capable of brokering it (the infrastructure part is inference).",
+        "confidence": "medium",
+        "citations": [
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.283034Z",
+            "note": null
+          }
+        ]
+      },
+      {
+        "text": "Clear, sellable lane: Pop/Latino on Deezer, tagged pop, Colombia, Bogotá, female vocalists on Last.fm, with similar-artist ties to Ventino, Sebastián Yatra and Camilo.",
+        "confidence": "medium",
+        "citations": [
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.049863Z",
+            "note": "tagged on 8 of 8 sampled releases"
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.049897Z",
+            "note": "tagged on 8 of 8 sampled releases"
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280415Z",
+            "note": "user-supplied tag"
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.280456Z",
+            "note": "user-supplied tag"
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.492038Z",
+            "note": "match=1.0 on a small audience is a co-listening artifact"
+          },
+          {
+            "source": "lastfm",
+            "url": "https://www.last.fm/music/Ela+Taubert",
+            "retrieved_at": "2026-09-14T00:29:08.492126Z",
+            "note": null
+          }
+        ]
+      }
+    ],
+    "risks": [
+      {
+        "text": "Catalog looks top-heavy on one song: '¿Cómo Pasó?' and its Joe Jonas version hold two of the top three Deezer tracks. Ask what share of streams the 2025-26 singles actually carry.",
+        "confidence": "medium",
+        "citations": [
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.282954Z",
+            "note": null
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.283034Z",
+            "note": null
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.283044Z",
+            "note": null
+          },
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:10.283053Z",
+            "note": null
+          }
+        ]
+      },
+      {
+        "text": "No Spotify data in this file at all — no monthly listeners, no followers, no playlist placements. That is the single biggest gap before any valuation conversation.",
+        "confidence": "low",
+        "citations": []
+      },
+      {
+        "text": "No Instagram, TikTok or any social data. For a pop artist with 575,000 YouTube subscribers, the absence of short-form traction evidence is a real unknown, not a neutral one.",
+        "confidence": "high",
+        "citations": [
+          {
+            "source": "youtube",
+            "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+            "retrieved_at": "2026-09-14T00:29:12.525986Z",
+            "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+          }
+        ]
+      },
+      {
+        "text": "Deezer shows only 5,858 fans against 492M YouTube views. Platform skew likely explains it, but ask whether audience is concentrated in one channel and one territory.",
+        "confidence": "medium",
+        "citations": [
+          {
+            "source": "deezer",
+            "url": "https://www.deezer.com/artist/65501282",
+            "retrieved_at": "2026-09-14T00:29:08.161747Z",
+            "note": "stands in for Spotify popularity, which the API no longer exposes"
+          },
+          {
+            "source": "youtube",
+            "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+            "retrieved_at": "2026-09-14T00:29:12.525997Z",
+            "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+          }
+        ]
+      },
+      {
+        "text": "Scale suggests this artist is probably already under a label and publishing deal; nothing in the file confirms rights status, term, or availability. Confirm before scheduling (inference).",
+        "confidence": "low",
+        "citations": []
+      }
+    ]
+  },
+  "ar_summary": [
+    {
+      "text": "Lead point: this is not a developing act at YouTube scale — 575,000 subscribers and 492,216,352 views across 134 videos. Any meeting should be framed as approaching an artist with an existing audience, not incubating one.",
+      "confidence": "high",
+      "citations": [
+        {
+          "source": "youtube",
+          "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+          "retrieved_at": "2026-09-14T00:29:12.525986Z",
+          "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+        },
+        {
+          "source": "youtube",
+          "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+          "retrieved_at": "2026-09-14T00:29:12.525997Z",
+          "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+        },
+        {
+          "source": "youtube",
+          "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+          "retrieved_at": "2026-09-14T00:29:12.526005Z",
+          "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+        },
+        {
+          "source": "youtube",
+          "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+          "retrieved_at": "2026-09-14T00:29:12.525975Z",
+          "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+        }
+      ]
+    },
+    {
+      "text": "Last.fm corroborates real listening depth: 71,087 listeners against 1,562,506 plays — roughly 22 plays per listener (my arithmetic), which points to repeat engagement rather than one-off viral traffic.",
+      "confidence": "high",
+      "citations": [
+        {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.280317Z",
+          "note": null
+        },
+        {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.280391Z",
+          "note": null
+        }
+      ]
+    },
+    {
+      "text": "A top-track listing of \"¿Cómo Pasó? (Con Joe Jonas)\" alongside the original implies an international collaboration and, by inference, label or management infrastructure already in place. Treat availability as the primary open question.",
+      "confidence": "medium",
+      "citations": [
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:10.282954Z",
+          "note": null
+        },
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:10.283034Z",
+          "note": null
+        }
+      ]
+    },
+    {
+      "text": "Release cadence is healthy and current: 31 total releases, 6 in the last 12 months, most recent \"No Tengo Remedio\" dated 2026-09-04. No dormancy risk in this file.",
+      "confidence": "high",
+      "citations": [
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.162064Z",
+          "note": null
+        },
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470558Z",
+          "note": "counted from dated releases"
+        },
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470401Z",
+          "note": null
+        },
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470468Z",
+          "note": null
+        }
+      ]
+    },
+    {
+      "text": "Evidence of deliberate campaign building: \"QUIERO OLVIDARTE (Respuesta #1)\", \"NO SUPISTE CUIDARNOS (Respuesta #2)\" and \"RESPUESTAS A LAS 11:11\" form a numbered answer-song sequence — a narrative rollout, not scattered singles.",
+      "confidence": "medium",
+      "citations": [
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470515Z",
+          "note": null
+        },
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470509Z",
+          "note": null
+        },
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.470496Z",
+          "note": null
+        }
+      ]
+    },
+    {
+      "text": "Risk: Deezer shows only 5,858 fans, wildly out of step with the YouTube and Last.fm figures. Audience is concentrated on video, and DSP follower conversion outside the lead platform looks weak.",
+      "confidence": "high",
+      "citations": [
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:08.161747Z",
+          "note": "stands in for Spotify popularity, which the API no longer exposes"
+        },
+        {
+          "source": "youtube",
+          "url": "https://www.youtube.com/channel/UClFHZoZkb_xyy6NIByChp2w",
+          "retrieved_at": "2026-09-14T00:29:12.525986Z",
+          "note": "verified against known releases: Ela Taubert - No Tengo Remedio (Official Video), Ela Taubert - No Tengo Remedio (Pseudo Video), Ela Taubert - Hasta El Fin Del Mundo (Visualizer)"
+        },
+        {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.280317Z",
+          "note": null
+        }
+      ]
+    },
+    {
+      "text": "Caveat on coverage: the file contains no Spotify, Instagram or TikTok data at all — not even a queried-and-empty marker. Streaming monthly listeners and social following are unknown, so commercial scale cannot be sized from this evidence.",
+      "confidence": "low",
+      "citations": []
+    },
+    {
+      "text": "Positioning is clear and unglamorous to underwrite: Pop/Latino, tagged Colombia and Bogotá, sitting next to Ventino (similarity 1.0), Sebastián Yatra and Camilo — mainstream Latin pop, a crowded lane with proven ceilings.",
+      "confidence": "medium",
+      "citations": [
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:10.049863Z",
+          "note": "tagged on 8 of 8 sampled releases"
+        },
+        {
+          "source": "deezer",
+          "url": "https://www.deezer.com/artist/65501282",
+          "retrieved_at": "2026-09-14T00:29:10.049897Z",
+          "note": "tagged on 8 of 8 sampled releases"
+        },
+        {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.280433Z",
+          "note": "user-supplied tag"
+        },
+        {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.280456Z",
+          "note": "user-supplied tag"
+        },
+        {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.492038Z",
+          "note": "match=1.0 on a small audience is a co-listening artifact"
+        },
+        {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.492094Z",
+          "note": null
+        },
+        {
+          "source": "lastfm",
+          "url": "https://www.last.fm/music/Ela+Taubert",
+          "retrieved_at": "2026-09-14T00:29:08.492126Z",
+          "note": null
+        }
+      ]
+    }
+  ],
+  "data_quality": {
+    "coverage_score": 1.0,
+    "sources_used": [
+      "deezer",
+      "lastfm",
+      "youtube"
+    ],
+    "sources_failed": [],
+    "fields_absent": [],
+    "caveats": [
+      "The peer set is built on Deezer fans (5858), but YouTube shows 575000 subscribers and 492216352 views. If the YouTube figure is the truer scale, these 'peers' sit well below Ela and the tier read is wrong.",
+      "YouTube's 492216352 views are unsegmented — they could be concentrated in one territory or spread across all Spanish-speaking markets, and this file cannot distinguish the two.",
+      "No Spotify, Instagram or TikTok evidence appears in the file, and no source_status rows record those queries — the absence is unexplained rather than confirmed empty.",
+      "Related-artist edges reflect co-listening and catalogue similarity, not where fans live. Aitana's 348001 Deezer fans say nothing about this artist's Spanish audience.",
+      "No Spotify, Instagram, TikTok, press or touring evidence in the file — live activity, campaigns and playlist support in the last 12 months are entirely unverified.",
+      "Ventino is Ela's top Last.fm similar at 1.0 but carries no audience figure anywhere in the file, so it cannot be sized or assigned to either group.",
+      "No free source in this file exposes listeners by country. Every market claim above is inference from tags and adjacency, not measured geography.",
+      "Last.fm listener and play counts reflect a self-selecting scrobbling population, typically skewed away from Latin pop's core audience.",
+      "Scale is uneven and unexplained: 575,000 YouTube subscribers against 5,858 Deezer fans — platform mix, not necessarily true reach.",
+      "No trajectory analog has dated history in the evidence; every 'what happened next' is inference from a single current fan count."
+    ],
+    "ungrounded_claims": []
+  }
+}

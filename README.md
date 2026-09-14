@@ -30,6 +30,12 @@ surfaces them above the famous act they resemble.
 
 Roughly 35-70 seconds and $0.30-0.50 per report.
 
+## Example output
+
+[`examples/report-ela-taubert.md`](examples/report-ela-taubert.md) — real,
+unedited output from one command. See [`examples/`](examples/) for what to look
+at in it.
+
 ## Setup
 
 ```bash
@@ -116,4 +122,19 @@ the report shipped with a figure no source returned; exit code is 2.
   twice across sections. That is the price of 35 seconds instead of four
   minutes.
 
-See `SOURCES.md` for the full feasibility matrix and `PLAN.md` for scope.
+## Tests
+
+```bash
+pytest tests/
+```
+
+The suite is built around the failures this project actually hit, because they
+are the ones that recur: resolving a short artist name to a famous act instead
+of the target, a validator crying wolf on date fragments until nobody reads it,
+and an unreachable source scoring identically to an artist with nothing to show.
+
+## More
+
+`SOURCES.md` — the feasibility matrix, written from probing rather than docs.
+`AUDIT.md` — acceptance results, including the two criteria that could not be
+tested and why. `PLAN.md` — scope.

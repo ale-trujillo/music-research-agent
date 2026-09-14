@@ -1,3 +1,8 @@
+> **Superseded.** This was the original 4-5 week plan. The MVP was built to
+> `PLAN.md` instead, in three days. Kept for the reasoning about scope and
+> risk — in particular risk R1, source availability, which is exactly what
+> went on to reshape the project. See `SOURCES.md` for what actually happened.
+
 # Music Research Agent — MVP Roadmap
 
 **Owner:** Alejandro Trujillo · **Doc status:** draft v0.1 · **Fecha:** 2026-09-12
