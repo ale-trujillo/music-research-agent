@@ -187,6 +187,14 @@ Set the source credentials as environment variables in the Vercel project —
 free key. `GET /api/health` reports which of them arrived and what the
 deployment can do without them.
 
+**Report generation is the only paid action, and a public URL needs a control on
+it.** A shared daily allowance (`FREE_REPORTS_PER_DAY`, default 3) lets a visitor
+see the thing work without a password on the one button worth pressing, and
+bounds the day's exposure whatever happens. `REPORT_TOKEN` skips the allowance,
+and is checked first so the owner never consumes a visitor's share. Everything
+else — search, artist pages, catalogue breakdown, comparison, discovery — stays
+open and costs nothing.
+
 **Favorites need a key-value store.** A deployed function has no durable
 filesystem, so add Vercel KV or an Upstash Redis project and the store picks it
 up from either service's variable names. Without one, favorites fall back to

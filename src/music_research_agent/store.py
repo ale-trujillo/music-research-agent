@@ -234,3 +234,70 @@ def storage_is_durable() -> bool:
         (os.getenv("KV_REST_API_URL") or os.getenv("UPSTASH_REDIS_REST_URL"))
         and (os.getenv("KV_REST_API_TOKEN") or os.getenv("UPSTASH_REDIS_REST_TOKEN"))
     ) or not os.getenv("VERCEL")
+
+
+class DailyBudget:
+    """A shared daily allowance for the one action that costs money.
+
+    A public demo has two bad options if this is the only control: leave report
+    generation open and let anyone spend without limit, or gate it behind a
+    secret and have the first visitor hit a password box on the one button worth
+    pressing. A small free allowance avoids both — a visitor gets to see the
+    thing work, and the day's exposure is bounded whatever happens.
+
+    The counter lives in Redis with a day's expiry, so it is shared across
+    instances. Without Redis there is nowhere to count, and the token becomes
+    required again rather than the limit silently not applying.
+    """
+
+    def __init__(self, url: str | None, token: str | None, allowance: int):
+        self.url = url.rstrip("/") if url else None
+        self.headers = {"Authorization": f"Bearer {token}"} if token else None
+        self.allowance = allowance
+
+    @property
+    def enforceable(self) -> bool:
+        return bool(self.url and self.headers and self.allowance > 0)
+
+    def _key(self) -> str:
+        return f"reports:{datetime.now(UTC):%Y-%m-%d}"
+
+    def used_today(self) -> int:
+        if not self.enforceable:
+            return 0
+        import httpx
+
+        try:
+            response = httpx.get(f"{self.url}/get/{self._key()}", headers=self.headers, timeout=5)
+            return int(response.json().get("result") or 0)
+        except Exception:
+            return 0
+
+    def spend(self) -> tuple[bool, int]:
+        """Claim one report. Returns (allowed, remaining after this one)."""
+        if not self.enforceable:
+            return False, 0
+        import httpx
+
+        try:
+            key = self._key()
+            used = int(httpx.post(f"{self.url}/incr/{key}", headers=self.headers,
+                                  timeout=5).json().get("result") or 0)
+            # Expire the counter rather than sweeping it; a stale day costs
+            # nothing and the reset is then automatic.
+            httpx.post(f"{self.url}/expire/{key}/172800", headers=self.headers, timeout=5)
+        except Exception:
+            # Counting failed, so the limit cannot be honoured. Refusing is the
+            # safe direction when the thing being protected is money.
+            return False, 0
+        if used > self.allowance:
+            return False, 0
+        return True, self.allowance - used
+
+
+def open_budget() -> DailyBudget:
+    return DailyBudget(
+        os.getenv("KV_REST_API_URL") or os.getenv("UPSTASH_REDIS_REST_URL"),
+        os.getenv("KV_REST_API_TOKEN") or os.getenv("UPSTASH_REDIS_REST_TOKEN"),
+        int(os.getenv("FREE_REPORTS_PER_DAY", "3")),
+    )

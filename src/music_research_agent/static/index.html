@@ -466,7 +466,7 @@ async function generateReport(query, button) {
     slot.innerHTML = '';
     const p = el('div', 'panel');
     p.append(el('div', 'empty', err.message));
-    if (/protected/i.test(err.message)) {
+    if (/protected/i.test(err.message) || /free reports/i.test(err.message)) {
       const field = el('input'); field.type = 'text'; field.placeholder = 'Report token';
       field.style.maxWidth = '280px';
       const go = el('button', 'act', 'Unlock'); go.style.marginLeft = '8px';

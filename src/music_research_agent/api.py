@@ -35,13 +35,14 @@ from .schema import ArtistReport, AudienceShape, Identity
 from .search import ArtistHit, search_artists
 from .profile import ArtistProfile, Link, build_profile
 from .shape import build_shape
-from .store import Favorite, open_store, storage_is_durable
+from .store import Favorite, open_budget, open_store, storage_is_durable
 from .triage import Triaged, triage
 
 load_dotenv()
 
 app = FastAPI(title="Music Research Agent", version="0.1.0")
 store = open_store()
+budget = open_budget()
 STATIC = Path(__file__).parent / "static"
 
 
@@ -55,15 +56,31 @@ class SaveRequest(BaseModel):
 # an open tab on someone else's account, so that one endpoint — and only that
 # one — can be put behind a shared secret. Set REPORT_TOKEN to turn it on;
 # unset, the service behaves as it does locally.
-def require_report_token(x_report_token: str | None = Header(default=None)) -> None:
+def require_report_budget(x_report_token: str | None = Header(default=None)) -> None:
+    """A token skips the queue; without one, the day's free allowance applies.
+
+    Ordering matters: the token is checked first so the owner never consumes
+    the allowance meant for visitors.
+    """
     expected = os.getenv("REPORT_TOKEN")
-    if expected and x_report_token != expected:
-        raise HTTPException(
-            401,
-            "Report generation is the only paid action here and is protected on this "
-            "deployment. Everything else — search, artist pages, comparison, discovery "
-            "— is open and costs nothing.",
-        )
+    if expected and x_report_token == expected:
+        return
+
+    allowed, remaining = budget.spend()
+    if allowed:
+        return
+
+    if budget.enforceable:
+        raise HTTPException(429, (
+            f"The {budget.allowance} free reports for today have been used. Everything "
+            "else here — search, artist pages, catalogue breakdown, comparison, "
+            "discovery — stays open and costs nothing. Reports resume tomorrow."
+        ))
+    raise HTTPException(401, (
+        "Report generation is the only paid action here and is protected on this "
+        "deployment. Everything else — search, artist pages, comparison, discovery "
+        "— is open and costs nothing."
+    ))
 
 
 class ReportResponse(BaseModel):
@@ -165,6 +182,8 @@ def api_health() -> dict[str, object]:
         "ok": True,
         "durable_favorites": storage_is_durable(),
         "report_protected": bool(os.getenv("REPORT_TOKEN")),
+        "free_reports_per_day": budget.allowance if budget.enforceable else 0,
+        "free_reports_used_today": budget.used_today(),
         "analysis_configured": bool(os.getenv("ANTHROPIC_API_KEY")),
         "sources": {
             name: bool(os.getenv(var)) for name, var in (
@@ -218,7 +237,7 @@ async def api_discover(seeds: str | None = None, top: int = 20) -> list[Triaged]
 
 @app.post("/api/report", response_model=ReportResponse)
 async def api_report(
-    request: SaveRequest, _: None = Depends(require_report_token)
+    request: SaveRequest, _: None = Depends(require_report_budget)
 ) -> ReportResponse:
     """The only expensive call here. Takes 35-80 seconds and costs about $0.35."""
     started = time.time()
