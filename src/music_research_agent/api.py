@@ -16,7 +16,7 @@ from pathlib import Path
 
 import httpx
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -48,6 +48,22 @@ STATIC = Path(__file__).parent / "static"
 class SaveRequest(BaseModel):
     query: str
     note: str | None = None
+
+
+# Everything in this service is free to run except report generation, which
+# spends real money per call. A public URL with an unguarded spend endpoint is
+# an open tab on someone else's account, so that one endpoint — and only that
+# one — can be put behind a shared secret. Set REPORT_TOKEN to turn it on;
+# unset, the service behaves as it does locally.
+def require_report_token(x_report_token: str | None = Header(default=None)) -> None:
+    expected = os.getenv("REPORT_TOKEN")
+    if expected and x_report_token != expected:
+        raise HTTPException(
+            401,
+            "Report generation is the only paid action here and is protected on this "
+            "deployment. Everything else — search, artist pages, comparison, discovery "
+            "— is open and costs nothing.",
+        )
 
 
 class ReportResponse(BaseModel):
@@ -148,6 +164,7 @@ def api_health() -> dict[str, object]:
     return {
         "ok": True,
         "durable_favorites": storage_is_durable(),
+        "report_protected": bool(os.getenv("REPORT_TOKEN")),
         "analysis_configured": bool(os.getenv("ANTHROPIC_API_KEY")),
         "sources": {
             name: bool(os.getenv(var)) for name, var in (
@@ -200,7 +217,9 @@ async def api_discover(seeds: str | None = None, top: int = 20) -> list[Triaged]
 
 
 @app.post("/api/report", response_model=ReportResponse)
-async def api_report(request: SaveRequest) -> ReportResponse:
+async def api_report(
+    request: SaveRequest, _: None = Depends(require_report_token)
+) -> ReportResponse:
     """The only expensive call here. Takes 35-80 seconds and costs about $0.35."""
     started = time.time()
     bundle = await collect(request.query)

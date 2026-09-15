@@ -203,6 +203,9 @@ const $ = (s, r = document) => r.querySelector(s);
 const el = (t, c, txt) => { const n = document.createElement(t); if (c) n.className = c;
                             if (txt !== undefined) n.textContent = txt; return n; };
 const num = v => v === null || v === undefined ? "—" : v.toLocaleString();
+let reportToken = null;
+try { reportToken = localStorage.getItem('reportToken'); } catch { /* private window */ }
+
 const api = async (path, opts) => {
   const r = await fetch(path, opts);
   if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || r.statusText);
@@ -450,8 +453,9 @@ async function generateReport(query, button) {
   slot.innerHTML = '<div class="panel"><div class="empty spinner">'
     + 'Running six analyses over the collected evidence. This takes about a minute.</div></div>';
   try {
-    const d = await api('/api/report', { method: 'POST',
-      headers: { 'content-type': 'application/json' },
+    const headers = { 'content-type': 'application/json' };
+    if (reportToken) headers['x-report-token'] = reportToken;
+    const d = await api('/api/report', { method: 'POST', headers,
       body: JSON.stringify({ query }) });
     slot.innerHTML = '';
     const panel = el('div', 'panel report');
@@ -460,7 +464,23 @@ async function generateReport(query, button) {
     button.textContent = `Report ready  ·  ${d.report.duration_s}s  ·  $${d.report.cost_usd}`;
   } catch (err) {
     slot.innerHTML = '';
-    const p = el('div', 'panel'); p.append(el('div', 'empty', err.message)); slot.append(p);
+    const p = el('div', 'panel');
+    p.append(el('div', 'empty', err.message));
+    if (/protected/i.test(err.message)) {
+      const field = el('input'); field.type = 'text'; field.placeholder = 'Report token';
+      field.style.maxWidth = '280px';
+      const go = el('button', 'act', 'Unlock'); go.style.marginLeft = '8px';
+      go.onclick = () => {
+        reportToken = field.value.trim();
+        try { localStorage.setItem('reportToken', reportToken); } catch { /* ignore */ }
+        button.disabled = false;
+        generateReport(query, button);
+      };
+      const box = el('div'); box.style.textAlign = 'center';
+      box.append(field, go);
+      p.append(box);
+    }
+    slot.append(p);
     button.disabled = false; button.textContent = 'Retry report';
   }
 }
