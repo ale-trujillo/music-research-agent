@@ -188,7 +188,7 @@ free key. `GET /api/health` reports which of them arrived and what the
 deployment can do without them.
 
 **Report generation is the only paid action, and a public URL needs a control on
-it.** A shared daily allowance (`FREE_REPORTS_PER_DAY`, default 3) lets a visitor
+it.** A shared daily allowance (`FREE_REPORTS_PER_DAY`, default 20) lets a visitor
 see the thing work without a password on the one button worth pressing, and
 bounds the day's exposure whatever happens. `REPORT_TOKEN` skips the allowance,
 and is checked first so the owner never consumes a visitor's share. Everything

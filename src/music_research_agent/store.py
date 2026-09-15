@@ -299,5 +299,5 @@ def open_budget() -> DailyBudget:
     return DailyBudget(
         os.getenv("KV_REST_API_URL") or os.getenv("UPSTASH_REDIS_REST_URL"),
         os.getenv("KV_REST_API_TOKEN") or os.getenv("UPSTASH_REDIS_REST_TOKEN"),
-        int(os.getenv("FREE_REPORTS_PER_DAY", "3")),
+        int(os.getenv("FREE_REPORTS_PER_DAY", "20")),
     )
