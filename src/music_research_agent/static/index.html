@@ -76,6 +76,7 @@
   @media (max-width: 540px) { .row { align-items: flex-start; } }
   .clickable { cursor: pointer; }
   .clickable:hover .name { color: var(--accent); }
+  td.clickable .name { font-weight: 500; }
   .back { background: none; border: 0; color: var(--muted); font: inherit;
           cursor: pointer; padding: 0 0 12px; }
   .back:hover { color: var(--accent); }
@@ -561,9 +562,13 @@ $('#rundiscover').onclick = async () => {
     t.append(h);
     rows.forEach(r => {
       const tr = el('tr');
-      const name = el('td');
-      name.append(el('div', null, r.name));
+      const name = el('td', 'clickable');
+      name.append(el('div', 'name', r.name));
       if (r.reasons?.length) name.append(el('div', 'hint', r.reasons[0]));
+      // A candidate is only worth surfacing if you can look into it, and the
+      // Deezer id is already resolved by the time triage ranks it.
+      name.onclick = () => openArtist(
+        r.deezer_id ? `https://www.deezer.com/artist/${r.deezer_id}` : r.name, r.name);
       tr.append(name, el('td', 'num', r.score.toFixed(1)), el('td', 'num', num(r.fans)),
                 el('td', 'num', num(r.listeners)),
                 el('td', 'num', r.releases_12mo === null ? '?' : r.releases_12mo),
