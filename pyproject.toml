@@ -11,6 +11,10 @@ dependencies = [
     "tenacity>=9.0",
 ]
 
+[project.optional-dependencies]
+web = ["fastapi>=0.115", "uvicorn[standard]>=0.30"]
+dev = ["pytest>=8.0"]
+
 [project.scripts]
 music-research-agent = "music_research_agent.__main__:main"
 

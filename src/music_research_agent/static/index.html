@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Music Research Agent</title>
+<style>
+  :root {
+    --bg: #fbfaf8; --panel: #ffffff; --line: #e6e2dc; --ink: #1c1a18;
+    --muted: #6d6660; --accent: #8a4b2a; --accent-soft: #f3ece6;
+    --good: #2f6b45; --warn: #8a6d1f;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  :root:not([data-theme="light"]) { }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17161a; --panel: #1f1e23; --line: #322f38; --ink: #eceaf0;
+      --muted: #9b95a3; --accent: #e0916a; --accent-soft: #2a2228;
+      --good: #6dbd8c; --warn: #d4b25c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17161a; --panel: #1f1e23; --line: #322f38; --ink: #eceaf0;
+    --muted: #9b95a3; --accent: #e0916a; --accent-soft: #2a2228;
+    --good: #6dbd8c; --warn: #d4b25c;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); margin: 0;
+         font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding-block: 32px; padding-inline: 20px; }
+  header h1 { font-size: 1.45rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header p { margin: 0 0 24px; color: var(--muted); font-size: 0.92rem; max-width: 62ch; }
+  nav { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 24px;
+        flex-wrap: wrap; }
+  nav button { background: none; border: 0; border-bottom: 2px solid transparent;
+               padding: 10px 14px; font: inherit; color: var(--muted); cursor: pointer; }
+  nav button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+  nav button:hover { color: var(--ink); }
+  .panel { background: var(--panel); border: 1px solid var(--line);
+           border-radius: 10px; padding: 18px; margin-bottom: 16px; }
+  input[type=text] { width: 100%; padding: 11px 13px; font: inherit; color: var(--ink);
+                     background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
+  input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  button.act { background: var(--accent); color: var(--bg); border: 0; border-radius: 7px;
+               padding: 7px 13px; font: inherit; font-size: 0.88rem; cursor: pointer; }
+  button.act:hover { filter: brightness(1.08); }
+  button.ghost { background: none; border: 1px solid var(--line); color: var(--muted);
+                 border-radius: 7px; padding: 6px 11px; font: inherit; font-size: 0.84rem;
+                 cursor: pointer; }
+  button.ghost:hover { color: var(--ink); border-color: var(--accent); }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 14px;
+         padding: 11px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .row:last-child { border-bottom: 0; }
+  .name { font-weight: 600; }
+  .meta { color: var(--muted); font-size: 0.85rem; font-family: var(--mono); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); }
+  th { font-weight: 600; font-size: 0.8rem; text-transform: uppercase;
+       letter-spacing: 0.04em; color: var(--muted); }
+  td.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  td.lead { color: var(--good); font-weight: 600; }
+  .scroll { overflow-x: auto; }
+  .tag { display: inline-block; font-size: 0.72rem; padding: 2px 7px; border-radius: 99px;
+         background: var(--accent-soft); color: var(--accent); margin-left: 7px;
+         vertical-align: middle; }
+  .note { color: var(--muted); font-size: 0.85rem; border-left: 2px solid var(--line);
+          padding-left: 12px; margin: 10px 0; }
+  .hint { color: var(--muted); font-size: 0.85rem; }
+  .up { color: var(--good); } .down { color: var(--warn); }
+  .pick { display: flex; align-items: center; gap: 8px; }
+  h2 { font-size: 1.02rem; margin: 0 0 4px; }
+  h3 { font-size: 0.86rem; text-transform: uppercase; letter-spacing: 0.05em;
+       color: var(--muted); margin: 22px 0 8px; }
+  .sub { color: var(--muted); font-size: 0.87rem; margin: 0 0 14px; }
+  .empty { color: var(--muted); padding: 22px 0; text-align: center; }
+  @media (max-width: 540px) { .row { align-items: flex-start; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Music Research Agent</h1>
+    <p>A&amp;R screening for emerging artists, from public data only. Every figure
+       traces to the platform it came from, and anything the sources could not
+       establish is reported as unknown rather than estimated.</p>
+  </header>
+
+  <nav role="tablist">
+    <button role="tab" data-tab="search" aria-selected="true">Search</button>
+    <button role="tab" data-tab="favorites" aria-selected="false">Favorites</button>
+    <button role="tab" data-tab="compare" aria-selected="false">Compare</button>
+    <button role="tab" data-tab="discover" aria-selected="false">Discover</button>
+  </nav>
+
+  <section id="search" class="tab">
+    <div class="panel">
+      <input type="text" id="q" placeholder="Artist name, or paste a Spotify / Deezer / YouTube profile link"
+             autocomplete="off" spellcheck="false">
+      <p class="hint" style="margin:10px 0 0">Pasting a profile link skips name matching entirely —
+         the platform already identified the artist, so nothing can resolve to the wrong one.</p>
+    </div>
+    <div class="panel" id="results"><div class="empty">Start typing to search.</div></div>
+  </section>
+
+  <section id="favorites" class="tab" hidden>
+    <div class="panel">
+      <h2>Saved artists</h2>
+      <p class="sub">Saving records today's figures. Save the same artist again later and the
+         snapshot becomes a trend — public sources carry no history to backfill from.</p>
+      <div id="favlist"><div class="empty">Nothing saved yet.</div></div>
+    </div>
+  </section>
+
+  <section id="compare" class="tab" hidden>
+    <div class="panel">
+      <h2>Compare two artists</h2>
+      <p class="sub">Pick two saved artists.</p>
+      <div id="picker" class="scroll"></div>
+    </div>
+    <div id="comparison"></div>
+  </section>
+
+  <section id="discover" class="tab" hidden>
+    <div class="panel">
+      <h2>Find more like these</h2>
+      <p class="sub">Expands your saved artists through two discovery graphs and ranks what
+         comes back. Expansion and ranking use only free sources, so this costs nothing —
+         only a full report does.</p>
+      <button class="act" id="rundiscover">Run from favorites</button>
+      <div id="discovered" style="margin-top:16px"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const el = (t, c, txt) => { const n = document.createElement(t); if (c) n.className = c;
+                            if (txt !== undefined) n.textContent = txt; return n; };
+const num = v => v === null || v === undefined ? "—" : v.toLocaleString();
+const api = async (path, opts) => {
+  const r = await fetch(path, opts);
+  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || r.statusText);
+  return r.json();
+};
+
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.setAttribute('aria-selected', x === b));
+  document.querySelectorAll('.tab').forEach(s => s.hidden = s.id !== b.dataset.tab);
+  if (b.dataset.tab === 'favorites') loadFavorites();
+  if (b.dataset.tab === 'compare') loadPicker();
+});
+
+// ---- search -------------------------------------------------------------
+let timer;
+$('#q').addEventListener('input', e => {
+  clearTimeout(timer);
+  const q = e.target.value.trim();
+  if (!q) return void ($('#results').innerHTML = '<div class="empty">Start typing to search.</div>');
+  timer = setTimeout(() => runSearch(q), 220);
+});
+
+async function runSearch(q) {
+  const box = $('#results');
+  try {
+    const hits = await api(`/api/search?q=${encodeURIComponent(q)}`);
+    box.innerHTML = '';
+    if (!hits.length) return void box.append(el('div', 'empty', 'No artist matched.'));
+    hits.forEach(h => {
+      const row = el('div', 'row');
+      const left = el('div');
+      left.append(el('div', 'name', h.name),
+                  el('div', 'meta', `${num(h.fans)} followers · ${h.releases} releases`));
+      const save = el('button', 'act', 'Save');
+      save.onclick = async () => {
+        save.disabled = true; save.textContent = 'Saving…';
+        try { await api('/api/favorites', { method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ query: h.link || h.name }) });
+              save.textContent = 'Saved'; }
+        catch (err) { save.textContent = 'Failed'; save.title = err.message; }
+      };
+      row.append(left, save);
+      box.append(row);
+    });
+  } catch (err) { box.innerHTML = ''; box.append(el('div', 'empty', err.message)); }
+}
+
+// ---- favorites ----------------------------------------------------------
+async function loadFavorites() {
+  const box = $('#favlist');
+  const favs = await api('/api/favorites');
+  box.innerHTML = '';
+  if (!favs.length) return void box.append(el('div', 'empty', 'Nothing saved yet.'));
+  favs.forEach(f => {
+    const reading = f.readings.at(-1)?.metrics || {};
+    const row = el('div', 'row');
+    const left = el('div');
+    const title = el('div', 'name', f.name);
+    if (f.readings.length > 1) title.append(el('span', 'tag', `${f.readings.length} readings`));
+    left.append(title, el('div', 'meta',
+      [['deezer.fans', 'followers'], ['lastfm.listeners', 'listeners'],
+       ['youtube.subscribers', 'subscribers']]
+        .filter(([k]) => reading[k] != null)
+        .map(([k, label]) => `${num(reading[k])} ${label}`).join('  ·  ') || 'no figures captured'));
+    if (f.note) left.append(el('div', 'hint', f.note));
+    const drop = el('button', 'ghost', 'Remove');
+    drop.onclick = async () => { await api(`/api/favorites/${encodeURIComponent(f.name)}`,
+                                           { method: 'DELETE' }); loadFavorites(); };
+    row.append(left, drop);
+    box.append(row);
+  });
+}
+
+// ---- compare ------------------------------------------------------------
+async function loadPicker() {
+  const box = $('#picker');
+  const favs = await api('/api/favorites');
+  box.innerHTML = '';
+  if (favs.length < 2) return void box.append(
+    el('div', 'empty', 'Save at least two artists to compare them.'));
+  favs.forEach(f => {
+    const label = el('label', 'pick');
+    const cb = el('input'); cb.type = 'checkbox'; cb.value = f.name;
+    cb.onchange = () => {
+      const picked = [...box.querySelectorAll('input:checked')].map(i => i.value);
+      box.querySelectorAll('input').forEach(i => i.disabled = picked.length >= 2 && !i.checked);
+      picked.length === 2 ? renderComparison(picked) : ($('#comparison').innerHTML = '');
+    };
+    label.append(cb, el('span', null, f.name));
+    box.append(label);
+  });
+}
+
+function valueCell(row, name) {
+  const v = row.values[name];
+  const td = el('td', 'num', v === null ? '—' : v.toLocaleString());
+  if (row.comparable && row.leader === name) td.classList.add('lead');
+  return td;
+}
+
+async function renderComparison(names) {
+  const out = $('#comparison');
+  out.innerHTML = '<div class="panel"><div class="empty">Comparing…</div></div>';
+  const c = await api(`/api/compare?names=${encodeURIComponent(names.join(','))}`);
+  const [a, b] = c.artists;
+  out.innerHTML = '';
+  const panel = el('div', 'panel');
+
+  const section = (title, subtitle, rows) => {
+    panel.append(el('h3', null, title));
+    if (subtitle) panel.append(el('p', 'sub', subtitle));
+    const scroll = el('div', 'scroll');
+    const table = el('table');
+    const head = el('tr');
+    head.append(el('th', null, 'Measure'), el('th', null, a), el('th', null, b));
+    table.append(head);
+    rows.forEach(r => {
+      const tr = el('tr');
+      const label = el('td');
+      label.append(el('div', null, r.metric));
+      label.append(el('div', 'hint', r.note || r.measures));
+      tr.append(label, valueCell(r, a), valueCell(r, b));
+      table.append(tr);
+    });
+    scroll.append(table);
+    panel.append(scroll);
+  };
+
+  if (c.ratios.length) section('Ratios', 'Scale-free, so these survive a difference in size — the honest comparison.', c.ratios);
+  if (c.absolute.length) section('Absolute figures', 'Each row is one platform in its own unit. They are not addable.', c.absolute);
+
+  if (c.trends.length) {
+    panel.append(el('h3', null, 'Movement'));
+    const scroll = el('div', 'scroll'); const t = el('table');
+    const h = el('tr');
+    h.append(el('th', null, 'Artist'), el('th', null, 'Metric'), el('th', null, 'Change'), el('th', null, 'Over'));
+    t.append(h);
+    c.trends.forEach(tr => {
+      const row = el('tr');
+      const pct = el('td', 'num ' + (tr.percent > 0 ? 'up' : 'down'),
+                     `${tr.percent > 0 ? '+' : ''}${tr.percent}%`);
+      row.append(el('td', null, tr.artist), el('td', null, tr.metric), pct,
+                 el('td', 'num', `${tr.days}d`));
+      t.append(row);
+    });
+    scroll.append(t); panel.append(scroll);
+  }
+
+  c.notes.forEach(n => panel.append(el('div', 'note', n)));
+  out.append(panel);
+}
+
+// ---- discover -----------------------------------------------------------
+$('#rundiscover').onclick = async () => {
+  const box = $('#discovered');
+  box.innerHTML = '<div class="empty">Expanding and ranking…</div>';
+  try {
+    const rows = await api('/api/discover?top=20');
+    box.innerHTML = '';
+    const scroll = el('div', 'scroll'); const t = el('table');
+    const h = el('tr');
+    ['Artist', 'Score', 'Followers', 'Listeners', 'Releases/12mo', 'Plays per listener']
+      .forEach((x, i) => h.append(el('th', i ? 'num' : null, x)));
+    t.append(h);
+    rows.forEach(r => {
+      const tr = el('tr');
+      const name = el('td');
+      name.append(el('div', null, r.name));
+      if (r.reasons?.length) name.append(el('div', 'hint', r.reasons[0]));
+      tr.append(name, el('td', 'num', r.score.toFixed(1)), el('td', 'num', num(r.fans)),
+                el('td', 'num', num(r.listeners)),
+                el('td', 'num', r.releases_12mo === null ? '?' : r.releases_12mo),
+                el('td', 'num', r.plays_per_listener === null ? '?' : r.plays_per_listener));
+      t.append(tr);
+    });
+    scroll.append(t); box.append(scroll);
+    box.append(el('div', 'note',
+      'A "?" means the source could not be reached, not that the figure is zero — '
+      + 'those dimensions are excluded from the score rather than counted against the artist.'));
+  } catch (err) { box.innerHTML = ''; box.append(el('div', 'empty', err.message)); }
+};
+</script>
+</body>
+</html>
