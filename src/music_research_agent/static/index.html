@@ -99,6 +99,17 @@
   .report code { font-family: var(--mono); font-size: 0.85em;
                  background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; }
   .spinner { color: var(--muted); }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+           gap: 14px 22px; margin: 4px 0 0; }
+  .fact dt { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.05em;
+             color: var(--muted); margin: 0 0 2px; }
+  .fact dd { margin: 0; font-size: 0.95rem; }
+  .fact dd.none { color: var(--muted); font-size: 0.86rem; }
+  .links { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .links a { font-size: 0.84rem; text-decoration: none; color: var(--accent);
+             border: 1px solid var(--line); border-radius: 7px; padding: 5px 11px; }
+  .links a:hover { border-color: var(--accent); }
+  .saved-note { color: var(--good); font-size: 0.87rem; }
 </style>
 </head>
 <body>
@@ -247,21 +258,30 @@ async function openArtist(query, displayName) {
       head.append(el('div', 'note',
         `Not measured: ${d.shape.unobserved.join(', ')} — no public audience data.`));
     const act = el('div'); act.style.marginTop = '14px';
-    const save = el('button', 'act', 'Save to favorites');
-    save.onclick = async () => {
-      save.disabled = true; save.textContent = 'Saving…';
-      try { await api('/api/favorites', { method: 'POST',
-              headers: { 'content-type': 'application/json' },
-              body: JSON.stringify({ query }) });
-            save.textContent = 'Saved'; }
-      catch (e) { save.textContent = 'Failed'; save.title = e.message; }
-    };
-    const gen = el('button', 'ghost', 'Generate full report  ·  ~1 min, ~$0.35');
-    gen.style.marginLeft = '8px';
+    const gen = el('button', 'act', 'Generate full report');
     gen.onclick = () => generateReport(query, gen);
-    act.append(save, gen);
+    act.append(gen);
+    if (d.saved) {
+      const mark = el('span', 'saved-note', '  ✓ in favorites');
+      mark.style.marginLeft = '10px';
+      act.append(mark);
+    } else {
+      const save = el('button', 'ghost', 'Save to favorites');
+      save.style.marginLeft = '8px';
+      save.onclick = async () => {
+        save.disabled = true; save.textContent = 'Saving…';
+        try { await api('/api/favorites', { method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ query }) });
+              save.replaceWith(el('span', 'saved-note', '✓ in favorites')); }
+        catch (e) { save.textContent = 'Failed'; save.title = e.message; }
+      };
+      act.append(save);
+    }
     head.append(act);
     body.append(head);
+
+    body.append(identityCard(d.profile));
 
     const panel = el('div', 'panel');
     panel.append(el('h3', null, 'Audience'));
@@ -305,6 +325,50 @@ async function openArtist(query, displayName) {
     body.innerHTML = '';
     body.append(el('div', 'panel')).append(el('div', 'empty', err.message));
   }
+}
+
+function identityCard(p) {
+  const panel = el('div', 'panel');
+  panel.append(el('h3', null, 'Who this is'));
+
+  const facts = el('dl', 'facts');
+  const fact = (label, value, missing) => {
+    const box = el('div', 'fact');
+    box.append(el('dt', null, label));
+    box.append(value ? el('dd', null, value) : el('dd', 'none', missing));
+    facts.append(box);
+  };
+  // "not established" and "could not be retrieved" are different claims, and
+  // only one of them is about the artist.
+  const gap = p.biography_source === 'unavailable'
+    ? 'source unreachable' : 'not established';
+  fact('Name', p.name);
+  fact('Person or group', p.kind, gap);
+  fact('From', [p.origin, p.country].filter(Boolean).join(', '), gap);
+  fact('Active since', p.active_since, gap);
+  fact('Releases', p.releases != null ? p.releases.toLocaleString() : null, 'not available');
+  fact('Songs', p.songs != null ? p.songs.toLocaleString() : null, 'not available');
+  panel.append(facts);
+
+  if (p.links.length) {
+    const links = el('div', 'links');
+    p.links.forEach(l => {
+      const a = el('a', null, l.platform);
+      a.href = l.url; a.target = '_blank'; a.rel = 'noopener';
+      links.append(a);
+    });
+    panel.append(links);
+  }
+
+  if (p.biography_source === 'not covered')
+    panel.append(el('div', 'note',
+      'MusicBrainz has no entry for this artist, so origin and biography could not be '
+      + 'established. It covers roughly one emerging Latin American artist in four.'));
+  if (p.biography_source === 'unavailable')
+    panel.append(el('div', 'note',
+      'MusicBrainz could not be reached, so biography is unknown rather than absent — '
+      + 'this gap is ours, not the artist\'s.'));
+  return panel;
 }
 
 async function generateReport(query, button) {

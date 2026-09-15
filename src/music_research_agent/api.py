@@ -9,6 +9,7 @@ the domain code noticing.
 
 from __future__ import annotations
 
+import os
 import time
 import uuid
 from pathlib import Path
@@ -18,7 +19,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from .analysis.engine import AnalysisEngine
 from .assemble import Assembler
@@ -31,6 +32,7 @@ from .render import render
 from .resolve import resolve
 from .schema import ArtistReport, AudienceShape, Identity
 from .search import ArtistHit, search_artists
+from .profile import ArtistProfile, Link, build_profile
 from .shape import build_shape
 from .store import Favorite, JsonFileStore
 from .triage import Triaged, triage
@@ -61,10 +63,12 @@ class ArtistSummary(BaseModel):
     """
 
     identity: Identity
+    profile: ArtistProfile
     shape: AudienceShape
     metrics: list[Evidence]
     sources_used: list[str]
     sources_absent: list[str]
+    saved: bool = Field(default=False, description="Already in favorites")
 
 
 @app.get("/api/search", response_model=list[ArtistHit])
@@ -107,8 +111,23 @@ async def api_artist(query: str = Query(min_length=1)) -> ArtistSummary:
     bundle = await collect(query)
     if bundle.identity is None:
         raise HTTPException(404, f"could not resolve {query!r}")
+
+    user_agent = os.getenv("MUSICBRAINZ_USER_AGENT", "music-research-agent/0.1")
+    async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
+        profile = await build_profile(bundle.identity, client, user_agent)
+    for item in bundle.items:
+        if item.key == "youtube.artist_channel" and item.citation.url:
+            profile.links.append(Link(platform="YouTube", url=item.citation.url))
+
+    saved = any(
+        f.deezer_id and f.deezer_id == bundle.identity.deezer_id
+        or f.name.casefold() == bundle.identity.resolved_name.casefold()
+        for f in store.load()
+    )
     return ArtistSummary(
         identity=bundle.identity,
+        profile=profile,
+        saved=saved,
         shape=build_shape(bundle),
         metrics=[i for i in bundle.items
                  if isinstance(i.value, int) and not isinstance(i.value, bool)],
