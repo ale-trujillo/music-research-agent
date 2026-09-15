@@ -25,9 +25,13 @@ from .assemble import Assembler
 from .collect import collect
 from .compare import Comparison, compare
 from .discover import expand
+from .evidence import Evidence
+from .identify import looks_like_url, parse_reference
 from .render import render
-from .schema import ArtistReport
+from .resolve import resolve
+from .schema import ArtistReport, AudienceShape, Identity
 from .search import ArtistHit, search_artists
+from .shape import build_shape
 from .store import Favorite, JsonFileStore
 from .triage import Triaged, triage
 
@@ -48,9 +52,69 @@ class ReportResponse(BaseModel):
     markdown: str
 
 
+class ArtistSummary(BaseModel):
+    """Everything the free sources know, with no model involved.
+
+    This is what a page should open with: instant, costs nothing, and enough to
+    decide whether the artist is worth the thirty-five seconds and third of a
+    dollar a full report takes.
+    """
+
+    identity: Identity
+    shape: AudienceShape
+    metrics: list[Evidence]
+    sources_used: list[str]
+    sources_absent: list[str]
+
+
 @app.get("/api/search", response_model=list[ArtistHit])
 async def api_search(q: str = Query(min_length=1), limit: int = 8) -> list[ArtistHit]:
+    """Search by name, or resolve a pasted profile link.
+
+    A link has to be resolved rather than searched: handing Deezer a Spotify URL
+    as a text query returns nothing, which reads to a user as "artist not found"
+    when the artist was in fact perfectly identified.
+    """
+    if parse_reference(q) is not None:
+        async with httpx.AsyncClient(timeout=25, follow_redirects=True) as client:
+            identity = await resolve(q, client)
+            hit = ArtistHit(
+                name=identity.resolved_name,
+                deezer_id=identity.deezer_id or "",
+                fans=0, releases=0,
+                link=(f"https://www.deezer.com/artist/{identity.deezer_id}"
+                      if identity.deezer_id else q),
+            )
+            if identity.deezer_id:
+                detail = (await client.get(
+                    f"https://api.deezer.com/artist/{identity.deezer_id}")).json()
+                hit.fans = detail.get("nb_fan", 0)
+                hit.releases = detail.get("nb_album", 0)
+            return [hit]
+
+    if looks_like_url(q):
+        raise HTTPException(
+            400,
+            "That looks like a link but not one we recognise. Supported: Spotify, "
+            "Deezer, YouTube, Apple Music, Last.fm, MusicBrainz artist pages.",
+        )
     return await search_artists(q, limit=limit)
+
+
+@app.get("/api/artist", response_model=ArtistSummary)
+async def api_artist(query: str = Query(min_length=1)) -> ArtistSummary:
+    """Free, instant metrics for one artist. No model, no cost."""
+    bundle = await collect(query)
+    if bundle.identity is None:
+        raise HTTPException(404, f"could not resolve {query!r}")
+    return ArtistSummary(
+        identity=bundle.identity,
+        shape=build_shape(bundle),
+        metrics=[i for i in bundle.items
+                 if isinstance(i.value, int) and not isinstance(i.value, bool)],
+        sources_used=bundle.sources_used,
+        sources_absent=[f.source for f in bundle.sources_failed],
+    )
 
 
 @app.get("/api/favorites", response_model=list[Favorite])

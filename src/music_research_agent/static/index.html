@@ -74,6 +74,31 @@
   .sub { color: var(--muted); font-size: 0.87rem; margin: 0 0 14px; }
   .empty { color: var(--muted); padding: 22px 0; text-align: center; }
   @media (max-width: 540px) { .row { align-items: flex-start; } }
+  .clickable { cursor: pointer; }
+  .clickable:hover .name { color: var(--accent); }
+  .back { background: none; border: 0; color: var(--muted); font: inherit;
+          cursor: pointer; padding: 0 0 12px; }
+  .back:hover { color: var(--accent); }
+  .profile { font-size: 1.05rem; font-weight: 600; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0 0; }
+  .chip { font-size: 0.76rem; padding: 3px 9px; border-radius: 99px;
+          border: 1px solid var(--line); color: var(--muted); }
+  .chip.absent { border-style: dashed; }
+  .report { font-size: 0.93rem; }
+  .report h1 { font-size: 1.3rem; margin: 0 0 4px; }
+  .report h2 { font-size: 0.86rem; text-transform: uppercase; letter-spacing: 0.05em;
+               color: var(--muted); margin: 26px 0 8px;
+               border-top: 1px solid var(--line); padding-top: 18px; }
+  .report table { margin: 10px 0; }
+  .report blockquote { margin: 12px 0; padding-left: 12px; color: var(--muted);
+                       border-left: 2px solid var(--accent); }
+  .report ul { padding-left: 18px; } .report li { margin: 5px 0; }
+  .report em { color: var(--muted); font-style: normal; font-size: 0.86em; }
+  .report a { color: var(--accent); text-decoration: none; }
+  .report a:hover { text-decoration: underline; }
+  .report code { font-family: var(--mono); font-size: 0.85em;
+                 background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; }
+  .spinner { color: var(--muted); }
 </style>
 </head>
 <body>
@@ -100,6 +125,11 @@
          the platform already identified the artist, so nothing can resolve to the wrong one.</p>
     </div>
     <div class="panel" id="results"><div class="empty">Start typing to search.</div></div>
+  </section>
+
+  <section id="artist" class="tab" hidden>
+    <button class="back" id="backtosearch">&larr; Back</button>
+    <div id="artistbody"></div>
   </section>
 
   <section id="favorites" class="tab" hidden>
@@ -167,9 +197,10 @@ async function runSearch(q) {
     if (!hits.length) return void box.append(el('div', 'empty', 'No artist matched.'));
     hits.forEach(h => {
       const row = el('div', 'row');
-      const left = el('div');
+      const left = el('div', 'clickable');
       left.append(el('div', 'name', h.name),
                   el('div', 'meta', `${num(h.fans)} followers · ${h.releases} releases`));
+      left.onclick = () => openArtist(h.link || h.name, h.name);
       const save = el('button', 'act', 'Save');
       save.onclick = async () => {
         save.disabled = true; save.textContent = 'Saving…';
@@ -183,6 +214,161 @@ async function runSearch(q) {
       box.append(row);
     });
   } catch (err) { box.innerHTML = ''; box.append(el('div', 'empty', err.message)); }
+}
+
+// ---- artist page --------------------------------------------------------
+let currentArtist = null;
+
+$('#backtosearch').onclick = () => showTab('search');
+
+function showTab(name) {
+  document.querySelectorAll('nav button').forEach(x =>
+    x.setAttribute('aria-selected', x.dataset.tab === name));
+  document.querySelectorAll('.tab').forEach(s => s.hidden = s.id !== name);
+}
+
+async function openArtist(query, displayName) {
+  currentArtist = query;
+  showTab('artist');
+  const body = $('#artistbody');
+  body.innerHTML = `<div class="panel"><div class="empty spinner">Collecting ${displayName || ''}…</div></div>`;
+  try {
+    const d = await api(`/api/artist?query=${encodeURIComponent(query)}`);
+    body.innerHTML = '';
+
+    const head = el('div', 'panel');
+    head.append(el('h1', null, d.identity.resolved_name));
+    head.append(el('div', 'profile', d.shape.profile));
+    const chips = el('div', 'chips');
+    d.sources_used.forEach(s => chips.append(el('span', 'chip', s)));
+    d.sources_absent.forEach(s => chips.append(el('span', 'chip absent', `${s} — not retrieved`)));
+    head.append(chips);
+    if (d.shape.unobserved?.length)
+      head.append(el('div', 'note',
+        `Not measured: ${d.shape.unobserved.join(', ')} — no public audience data.`));
+    const act = el('div'); act.style.marginTop = '14px';
+    const save = el('button', 'act', 'Save to favorites');
+    save.onclick = async () => {
+      save.disabled = true; save.textContent = 'Saving…';
+      try { await api('/api/favorites', { method: 'POST',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({ query }) });
+            save.textContent = 'Saved'; }
+      catch (e) { save.textContent = 'Failed'; save.title = e.message; }
+    };
+    const gen = el('button', 'ghost', 'Generate full report  ·  ~1 min, ~$0.35');
+    gen.style.marginLeft = '8px';
+    gen.onclick = () => generateReport(query, gen);
+    act.append(save, gen);
+    head.append(act);
+    body.append(head);
+
+    const panel = el('div', 'panel');
+    panel.append(el('h3', null, 'Audience'));
+    panel.append(el('p', 'sub',
+      'Platforms measure different things, so these are not addable and no total is given.'));
+    const scroll = el('div', 'scroll'); const table = el('table');
+    const h = el('tr');
+    h.append(el('th', null, 'Platform'), el('th', 'num', 'Figure'),
+             el('th', null, 'Unit'), el('th', null, 'What it counts'));
+    table.append(h);
+    d.shape.signals.forEach(s => {
+      const tr = el('tr');
+      const plat = el('td');
+      const link = s.citation?.url ? el('a', null, s.platform) : el('span', null, s.platform);
+      if (s.citation?.url) { link.href = s.citation.url; link.target = '_blank'; link.rel = 'noopener'; }
+      plat.append(link);
+      tr.append(plat, el('td', 'num', num(s.value)), el('td', null, s.unit),
+                el('td', 'hint', s.measures));
+      table.append(tr);
+    });
+    scroll.append(table); panel.append(scroll);
+
+    if (d.shape.ratios.length) {
+      panel.append(el('h3', null, 'Derived'));
+      panel.append(el('p', 'sub', 'Arithmetic on the figures above, not reported by any source.'));
+      d.shape.ratios.forEach(r => {
+        const line = el('div', 'row');
+        const left = el('div');
+        left.append(el('div', 'name', `${r.name}: ${r.value.toLocaleString()}`));
+        left.append(el('div', 'hint', r.reads_as));
+        line.append(left);
+        panel.append(line);
+      });
+    }
+    d.shape.notes.forEach(n => panel.append(el('div', 'note', n)));
+    body.append(panel);
+
+    const slot = el('div'); slot.id = 'reportslot';
+    body.append(slot);
+  } catch (err) {
+    body.innerHTML = '';
+    body.append(el('div', 'panel')).append(el('div', 'empty', err.message));
+  }
+}
+
+async function generateReport(query, button) {
+  const slot = $('#reportslot');
+  button.disabled = true; button.textContent = 'Researching…';
+  slot.innerHTML = '<div class="panel"><div class="empty spinner">'
+    + 'Running six analyses over the collected evidence. This takes about a minute.</div></div>';
+  try {
+    const d = await api('/api/report', { method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ query }) });
+    slot.innerHTML = '';
+    const panel = el('div', 'panel report');
+    panel.innerHTML = markdownToHtml(d.markdown);
+    slot.append(panel);
+    button.textContent = `Report ready  ·  ${d.report.duration_s}s  ·  $${d.report.cost_usd}`;
+  } catch (err) {
+    slot.innerHTML = '';
+    const p = el('div', 'panel'); p.append(el('div', 'empty', err.message)); slot.append(p);
+    button.disabled = false; button.textContent = 'Retry report';
+  }
+}
+
+// Converts the exact Markdown subset our renderer emits. Escaping runs first,
+// so nothing in a report body can inject markup.
+function markdownToHtml(md) {
+  const esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  const inline = s => esc(s)
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  const out = [];
+  let list = null, table = null;
+  const closeList = () => { if (list) { out.push('</ul>'); list = null; } };
+  const closeTable = () => { if (table) { out.push('</table></div>'); table = null; } };
+
+  for (const raw of md.split('\n')) {
+    const line = raw.trimEnd();
+    if (/^\|[\s|:-]+\|$/.test(line)) continue;            // separator row
+    if (line.startsWith('|')) {
+      const cells = line.split('|').slice(1, -1).map(c => c.trim());
+      if (!table) { out.push('<div class="scroll"><table>'); table = 'head'; }
+      const tag = table === 'head' ? 'th' : 'td';
+      out.push('<tr>' + cells.map(c => `<${tag}>${inline(c)}</${tag}>`).join('') + '</tr>');
+      if (table === 'head') table = 'body';
+      continue;
+    }
+    closeTable();
+    if (!line) { closeList(); continue; }
+    const heading = line.match(/^(#{1,4})\s+(.*)$/);
+    if (heading) { closeList(); out.push(`<h${heading[1].length}>${inline(heading[2])}</h${heading[1].length}>`); continue; }
+    if (line.startsWith('> ')) { closeList(); out.push(`<blockquote>${inline(line.slice(2))}</blockquote>`); continue; }
+    if (line.startsWith('- ')) {
+      if (!list) { out.push('<ul>'); list = true; }
+      out.push(`<li>${inline(line.slice(2))}</li>`);
+      continue;
+    }
+    closeList();
+    out.push(`<p>${inline(line)}</p>`);
+  }
+  closeList(); closeTable();
+  return out.join('\n');
 }
 
 // ---- favorites ----------------------------------------------------------
@@ -203,6 +389,9 @@ async function loadFavorites() {
         .filter(([k]) => reading[k] != null)
         .map(([k, label]) => `${num(reading[k])} ${label}`).join('  ·  ') || 'no figures captured'));
     if (f.note) left.append(el('div', 'hint', f.note));
+    left.classList.add('clickable');
+    left.onclick = () => openArtist(
+      f.deezer_id ? `https://www.deezer.com/artist/${f.deezer_id}` : f.name, f.name);
     const drop = el('button', 'ghost', 'Remove');
     drop.onclick = async () => { await api(`/api/favorites/${encodeURIComponent(f.name)}`,
                                            { method: 'DELETE' }); loadFavorites(); };
