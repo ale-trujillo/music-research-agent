@@ -44,6 +44,40 @@ VARIANT = re.compile(
 ARTIST_PREFIX = re.compile(r"^[^-–]{1,40}\s*[-–]\s*")
 
 
+# One side may lack a space -- "Ela Taubert- TE PROMETO" is a real title. Both
+# sides missing is a hyphenated word, which must not be split.
+SEGMENT = re.compile(r"\s+[-–|·]\s*|\s*[-–|·]\s+")
+
+
+def clean_title(title: str, artist: str | None = None) -> str:
+    """The song name on its own, with original casing kept.
+
+    Titles put the artist on either side of the separator -- "Artist - Song" and
+    "Song - Artist x Guest | VISUALIZER" both occur on the same channel -- so
+    this works by segment rather than by prefix. Dropping a prefix alone left a
+    dangling "Song  - Artist" on the reversed form. The platform's own title
+    stays on the tooltip, where the collaborator credit is still readable.
+    """
+    text = VARIANT.sub("", title.strip()).strip()
+    if not artist:
+        return text.strip(" -–|·") or title.strip()
+
+    names = {artist.casefold()} | {w.casefold() for w in artist.split() if len(w) > 3}
+    kept = []
+    for segment in SEGMENT.split(text):
+        piece = segment.strip(" -–|·,")
+        if not piece:
+            continue
+        folded = piece.casefold()
+        # A segment that is the artist, or a credit list opening with them, is
+        # attribution rather than title.
+        if folded in names or any(folded.startswith(n) and len(folded) < len(n) + 24
+                                  for n in names):
+            continue
+        kept.append(piece)
+    return " - ".join(kept).strip(" -–|·") or text.strip(" -–|·") or title.strip()
+
+
 def canonical(title: str, artist: str | None = None) -> str:
     """Reduce a title to the song it is a version of."""
     text = unicodedata.normalize("NFKD", title)
@@ -56,7 +90,8 @@ def canonical(title: str, artist: str | None = None) -> str:
 
 
 class Work(BaseModel):
-    title: str
+    title: str = Field(description="Song name alone, for the label")
+    raw_title: str = Field(description="The platform's own title, kept for the tooltip")
     plays: int
     share: float = Field(description="Percent of the measured total")
     variants: int = Field(default=1, description="Versions grouped into this entry")
@@ -80,9 +115,11 @@ class Concentration(BaseModel):
 def _summarise(
     platform: str, unit: str, grouped: dict[str, tuple[str, int, int]],
     total: int, items: int, complete: bool, caveat: str | None,
+    artist: str | None = None,
 ) -> Concentration:
     works = sorted(
-        (Work(title=title, plays=plays, share=round(plays / total * 100, 1), variants=n)
+        (Work(title=clean_title(title, artist), raw_title=title, plays=plays,
+              share=round(plays / total * 100, 1), variants=n)
          for title, plays, n in grouped.values()),
         key=lambda w: -w.plays,
     ) if total else []
@@ -159,7 +196,8 @@ async def youtube_concentration(
         f"Covers {total:,} of {channel_total:,} lifetime channel views — the rest sits "
         "in videos beyond the pages read, so shares are of what was measured."
     )
-    return _summarise("YouTube", "views", grouped, total, len(video_ids), bool(complete), caveat)
+    return _summarise("YouTube", "views", grouped, total, len(video_ids),
+                      bool(complete), caveat, artist)
 
 
 async def lastfm_concentration(artist: str, client: httpx.AsyncClient) -> Concentration | None:
@@ -189,7 +227,7 @@ async def lastfm_concentration(artist: str, client: httpx.AsyncClient) -> Concen
     return _summarise(
         "Last.fm", "scrobbles", grouped, total, len(tracks), False,
         "Shares are of this artist's top tracks on Last.fm, whose users are a small "
-        "and unrepresentative sample of any market.",
+        "and unrepresentative sample of any market.", artist,
     )
 
 

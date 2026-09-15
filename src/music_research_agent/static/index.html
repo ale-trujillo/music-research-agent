@@ -376,13 +376,15 @@ function concentrationPanel(c) {
     const label = el('div', 'lbl');
     label.append(document.createTextNode(w.title));
     if (w.variants > 1) label.append(el('span', 'vcount', `  ${w.variants} versions`));
-    label.title = w.title;
+    label.title = w.raw_title || w.title;
 
     const track = el('div', 'track');
     const fill = el('div', 'fill');
     fill.style.width = `${(w.share / max) * 100}%`;
     // Hover carries the exact figure so the bars stay free of numbers.
-    track.title = `${w.title}\n${w.plays.toLocaleString()} ${c.unit} · ${w.share}%`;
+    // The platform's own title on hover, where the collaborator credit the
+    // label had to drop is still readable.
+    track.title = `${w.raw_title || w.title}\n${w.plays.toLocaleString()} ${c.unit} · ${w.share}%`;
     track.append(fill);
 
     bars.append(label, track, el('div', 'val', `${w.share}%`));
