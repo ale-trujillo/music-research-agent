@@ -206,8 +206,22 @@ const num = v => v === null || v === undefined ? "—" : v.toLocaleString();
 let reportToken = null;
 try { reportToken = localStorage.getItem('reportToken'); } catch { /* private window */ }
 
-const api = async (path, opts) => {
-  const r = await fetch(path, opts);
+// An opaque id, minted here and never sent anywhere else, so one browser's
+// saved artists stay that browser's. No account, and the server never learns
+// who anyone is — it only needs to tell two visitors apart. A shared
+// deployment without this showed everyone the same shortlist, and a list of
+// artists someone is quietly evaluating is not a thing to publish.
+const visitorId = (() => {
+  try {
+    let id = localStorage.getItem('visitorId');
+    if (!id) { id = crypto.randomUUID(); localStorage.setItem('visitorId', id); }
+    return id;
+  } catch { return crypto.randomUUID(); }  // private window: lasts the session
+})();
+
+const api = async (path, opts = {}) => {
+  const headers = { ...(opts.headers || {}), 'x-visitor': visitorId };
+  const r = await fetch(path, { ...opts, headers });
   if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || r.statusText);
   return r.json();
 };

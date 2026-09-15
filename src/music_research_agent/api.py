@@ -35,14 +35,23 @@ from .schema import ArtistReport, AudienceShape, Identity
 from .search import ArtistHit, search_artists
 from .profile import ArtistProfile, Link, build_profile
 from .shape import build_shape
-from .store import Favorite, open_budget, open_store, storage_is_durable
+from .store import Favorite, FavoriteStore, open_budget, open_store, storage_is_durable
 from .triage import Triaged, triage
 
 load_dotenv()
 
 app = FastAPI(title="Music Research Agent", version="0.1.0")
-store = open_store()
 budget = open_budget()
+
+
+def visitor_store(x_visitor: str | None = Header(default=None)) -> "FavoriteStore":
+    """One favorites list per browser, with no account to create.
+
+    The browser mints an opaque id and keeps it; the server never learns who
+    anyone is. Enough to stop a shared deployment from showing every visitor
+    the same shortlist, which is what it did before.
+    """
+    return open_store(x_visitor)
 STATIC = Path(__file__).parent / "static"
 
 
@@ -144,7 +153,9 @@ async def api_search(q: str = Query(min_length=1), limit: int = 8) -> list[Artis
 
 
 @app.get("/api/artist", response_model=ArtistSummary)
-async def api_artist(query: str = Query(min_length=1)) -> ArtistSummary:
+async def api_artist(
+    query: str = Query(min_length=1), store: FavoriteStore = Depends(visitor_store)
+) -> ArtistSummary:
     """Free, instant metrics for one artist. No model, no cost."""
     bundle = await collect(query)
     if bundle.identity is None:
@@ -195,12 +206,14 @@ def api_health() -> dict[str, object]:
 
 
 @app.get("/api/favorites", response_model=list[Favorite])
-def api_favorites() -> list[Favorite]:
+def api_favorites(store: FavoriteStore = Depends(visitor_store)) -> list[Favorite]:
     return store.load()
 
 
 @app.post("/api/favorites", response_model=Favorite)
-async def api_save(request: SaveRequest) -> Favorite:
+async def api_save(
+    request: SaveRequest, store: FavoriteStore = Depends(visitor_store)
+) -> Favorite:
     """Saving captures today's figures, so a second save produces a trend."""
     bundle = await collect(request.query)
     if bundle.identity is None:
@@ -209,14 +222,17 @@ async def api_save(request: SaveRequest) -> Favorite:
 
 
 @app.delete("/api/favorites/{key}")
-def api_forget(key: str) -> dict[str, bool]:
+def api_forget(key: str, store: FavoriteStore = Depends(visitor_store)) -> dict[str, bool]:
     if not store.remove(key):
         raise HTTPException(404, f"no saved artist matched {key!r}")
     return {"removed": True}
 
 
 @app.get("/api/compare", response_model=Comparison)
-def api_compare(names: str = Query(description="Comma-separated saved artist names")) -> Comparison:
+def api_compare(
+    names: str = Query(description="Comma-separated saved artist names"),
+    store: FavoriteStore = Depends(visitor_store),
+) -> Comparison:
     wanted = [n.strip().casefold() for n in names.split(",") if n.strip()]
     favorites = [f for f in store.load() if f.name.casefold() in wanted]
     if len(favorites) < 2:
@@ -225,7 +241,10 @@ def api_compare(names: str = Query(description="Comma-separated saved artist nam
 
 
 @app.get("/api/discover", response_model=list[Triaged])
-async def api_discover(seeds: str | None = None, top: int = 20) -> list[Triaged]:
+async def api_discover(
+    seeds: str | None = None, top: int = 20,
+    store: FavoriteStore = Depends(visitor_store),
+) -> list[Triaged]:
     """Expansion and triage cost nothing, so this endpoint is cheap to call."""
     seed_list = [s.strip() for s in seeds.split(",")] if seeds else store.seeds()
     if not seed_list:

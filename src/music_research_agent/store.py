@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from abc import ABC, abstractmethod
 from datetime import UTC, datetime
 from pathlib import Path
@@ -155,6 +156,9 @@ class JsonFileStore(FavoriteStore):
         )
 
 
+SAFE_SCOPE = re.compile(r"[^A-Za-z0-9_-]")
+
+
 class RedisStore(FavoriteStore):
     """Favorites in Upstash Redis, over its REST API.
 
@@ -163,16 +167,21 @@ class RedisStore(FavoriteStore):
     cannot hold a connection open between requests, and an HTTP call needs no
     pool to manage or tear down.
 
-    Everything lives under one key. A favorites list is small, read whole on
-    every view, and written rarely — splitting it across keys would buy nothing
-    and cost a round trip per artist.
+    Each visitor gets their own key. A single shared list was the first design
+    and it was wrong in a way worth recording: on a public URL it meant every
+    visitor read and could delete the owner's shortlist, and the artists someone
+    is quietly evaluating are exactly the thing they would not publish.
+
+    One key per visitor, not one per artist. A favorites list is small, read
+    whole on every view and written rarely, so splitting it further would cost a
+    round trip per artist and buy nothing.
     """
 
-    KEY = "favorites"
-
-    def __init__(self, url: str, token: str):
+    def __init__(self, url: str, token: str, scope: str | None = None):
         self.url = url.rstrip("/")
         self.headers = {"Authorization": f"Bearer {token}"}
+        clean = SAFE_SCOPE.sub("", scope or "")[:64]
+        self.KEY = f"favorites:{clean}" if clean else "favorites:shared"
 
     def load(self) -> list[Favorite]:
         import httpx
@@ -205,11 +214,14 @@ def _writable(path: Path) -> bool:
         return False
 
 
-def open_store() -> FavoriteStore:
+def open_store(scope: str | None = None) -> FavoriteStore:
     """Redis when a deployment provides it, a file otherwise.
 
     Both Vercel's KV integration and a direct Upstash project are accepted,
     since they set different names for the same service.
+
+    `scope` separates one visitor's list from another's on a shared deployment.
+    Locally there is one person and one file, so it is ignored there.
 
     Without either, a deployed instance still has to run: the working directory
     is read-only there, so the file falls back to /tmp. Those favorites last
@@ -220,7 +232,7 @@ def open_store() -> FavoriteStore:
     url = os.getenv("KV_REST_API_URL") or os.getenv("UPSTASH_REDIS_REST_URL")
     token = os.getenv("KV_REST_API_TOKEN") or os.getenv("UPSTASH_REDIS_REST_TOKEN")
     if url and token:
-        return RedisStore(url, token)
+        return RedisStore(url, token, scope)
 
     path = Path(os.getenv("FAVORITES_PATH", "favorites.json"))
     if not _writable(path):
