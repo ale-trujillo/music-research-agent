@@ -122,6 +122,48 @@ the report shipped with a figure no source returned; exit code is 2.
   twice across sections. That is the price of 35 seconds instead of four
   minutes.
 
+## What a solid version would require
+
+These are not a backlog. Each one is a property of what public data can do, and
+each was established by trying rather than assumed.
+
+**Trajectory, not snapshots.** Every free source returns a point-in-time figure:
+followers now, listeners now. Nothing exposes history, which is why every report
+says momentum describes release cadence rather than audience movement. Saved
+favorites record their figures on each save, so a series accumulates — but it
+starts the day you start watching, and no amount of engineering recovers what
+came before. Reading an artist's inflection points, the moment a trajectory bent,
+needs either months of your own tracking or a licensed data provider that kept
+the history for you. This is the gap that most limits the product, and it cannot
+be closed retroactively.
+
+**Comparing two artists side by side.** The only item here that is ordinary work
+rather than a data limit. Everything needed is already computed — audience shape
+normalises platforms into stated units, and triage scores candidates on the same
+axes. A comparison view is presentation over existing signals.
+
+**Audience demographics and geography.** No public source exposes listeners by
+country or city, let alone by age or gender. Not an oversight: it is personal
+data under GDPR and Colombia's Ley 1581, and commercially sensitive besides — a
+label would pay to see a competitor's conversion. Everything the reports say
+about markets is a proxy inferred from artist adjacency, and the reports label it
+as such. Real geography comes from the artist's own platform analytics, which
+requires their consent, or from a licensed aggregator, which requires a budget.
+There is no third path, and a tool that implied otherwise would be lying.
+
+**Live performance.** Absent entirely, and not for want of trying. Bandsintown
+returns 403 without granted authorisation, Songkick's API program is closed, and
+MusicBrainz has no meaningful coverage of emerging Latin American artists — a
+query for one returned a German festival with a similar name at a perfect match
+score. Touring is where an emerging artist's real traction shows first, so this
+is a substantive blind spot rather than a missing nice-to-have.
+
+**Verified correct, not verified useful.** The acceptance audit measured whether
+the tool is accurate, reproducible and honest about its gaps. It could not
+measure whether an A&R reader finds a report worth their time, because no A&R
+reader has reviewed one. That distinction should travel with any conclusion drawn
+from this repository.
+
 ## Tests
 
 ```bash

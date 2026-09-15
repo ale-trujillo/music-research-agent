@@ -136,3 +136,22 @@ so a reader can catch a bad resolution.
 Golden set audience sizes on Deezer span roughly 9 to 1,800 fans. These are
 genuinely emerging artists, and reports will be sparse. That sparsity is the
 A&R signal, not a system failure -- `data_quality` has to make it legible.
+
+
+## Live performance — no free source (probed 2026-09-14)
+
+| Source | Result |
+|---|---|
+| Bandsintown | `403` — authorisation required, an arbitrary `app_id` no longer works |
+| Songkick | `401` — API key required; the program is closed to new applicants |
+| MusicBrainz events | Useless here. A query for an emerging Colombian artist returned the **Taubertal-Festival** in Germany at `score=100`, a textual match on part of the surname with no relation to the artist |
+
+Touring is where an emerging artist's traction tends to appear before it reaches
+any streaming figure, so this is the most consequential gap in the source set.
+
+The MusicBrainz result is the fourth time this project has met the same failure:
+a confident, high-scoring match on a name that belongs to someone else. The
+others were a global star returned for a short artist name, a German subliminal
+audio channel returned for a Colombian artist, and a 105-subscriber channel
+winning a country match over the artist's real one. Name matching is the
+recurring hazard in this domain, and every layer here is built against it.
