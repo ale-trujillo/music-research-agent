@@ -1,0 +1,8 @@
+.venv/
+runs/
+.cache/
+tests/
+examples/
+favorites.json
+GOLDEN_SET.md
+*.md

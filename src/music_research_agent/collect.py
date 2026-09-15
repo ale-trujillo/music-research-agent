@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import time
 from pathlib import Path
 
@@ -37,7 +38,10 @@ NAME_MATCHED = [YouTubeAdapter()]
 SOURCE_COUNT = len(ID_JOINED) + len(NAME_MATCHED)
 
 
-CACHE_DIR = Path(".cache")
+# A deployed function only has /tmp, and that survives just as long as the
+# instance does. Caching is an optimisation here, never correctness, so a
+# read-only filesystem degrades to no cache rather than to an error.
+CACHE_DIR = Path(os.getenv("CACHE_DIR", ".cache"))
 # Bump whenever the shape of a collected bundle changes. Without it a pipeline
 # change serves yesterday's structure for a day and looks like a bug in the new
 # code: adding play-concentration returned empty for every cached artist.
@@ -80,8 +84,11 @@ async def collect(
         await _add_concentration(bundle, client)
 
     if use_cache:
-        CACHE_DIR.mkdir(exist_ok=True)
-        path.write_text(bundle.model_dump_json())
+        try:
+            CACHE_DIR.mkdir(parents=True, exist_ok=True)
+            path.write_text(bundle.model_dump_json())
+        except OSError:
+            pass
     return bundle
 
 

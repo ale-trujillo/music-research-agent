@@ -35,13 +35,13 @@ from .schema import ArtistReport, AudienceShape, Identity
 from .search import ArtistHit, search_artists
 from .profile import ArtistProfile, Link, build_profile
 from .shape import build_shape
-from .store import Favorite, JsonFileStore
+from .store import Favorite, open_store, storage_is_durable
 from .triage import Triaged, triage
 
 load_dotenv()
 
 app = FastAPI(title="Music Research Agent", version="0.1.0")
-store = JsonFileStore()
+store = open_store()
 STATIC = Path(__file__).parent / "static"
 
 
@@ -140,6 +140,22 @@ async def api_artist(query: str = Query(min_length=1)) -> ArtistSummary:
         sources_used=bundle.sources_used,
         sources_absent=[f.source for f in bundle.sources_failed],
     )
+
+
+@app.get("/api/health")
+def api_health() -> dict[str, object]:
+    """What the deployment can and cannot do right now."""
+    return {
+        "ok": True,
+        "durable_favorites": storage_is_durable(),
+        "analysis_configured": bool(os.getenv("ANTHROPIC_API_KEY")),
+        "sources": {
+            name: bool(os.getenv(var)) for name, var in (
+                ("spotify", "SPOTIFY_CLIENT_ID"), ("lastfm", "LASTFM_API_KEY"),
+                ("youtube", "YOUTUBE_API_KEY"),
+            )
+        } | {"deezer": True, "musicbrainz": True},
+    }
 
 
 @app.get("/api/favorites", response_model=list[Favorite])

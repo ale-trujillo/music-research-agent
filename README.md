@@ -164,6 +164,40 @@ measure whether an A&R reader finds a report worth their time, because no A&R
 reader has reviewed one. That distinction should travel with any conclusion drawn
 from this repository.
 
+## Running the interface
+
+```bash
+pip install -e ".[web]"
+uvicorn music_research_agent.api:app --reload
+```
+
+Search, an artist page, saved favorites with movement over time, a side-by-side
+comparison, and seed-based discovery. The full report sits behind an explicit
+button — it is the only part of the system that spends money.
+
+## Deploying
+
+```bash
+vercel login && vercel        # preview
+vercel --prod
+```
+
+Set the source credentials as environment variables in the Vercel project —
+`ANTHROPIC_API_KEY` is the only one that costs anything; everything else is a
+free key. `GET /api/health` reports which of them arrived and what the
+deployment can do without them.
+
+**Favorites need a key-value store.** A deployed function has no durable
+filesystem, so add Vercel KV or an Upstash Redis project and the store picks it
+up from either service's variable names. Without one, favorites fall back to
+`/tmp` and last only as long as the instance — `/api/health` reports
+`durable_favorites: false` so the gap is visible rather than discovered when a
+saved artist disappears.
+
+Reports take 35 to 80 seconds. Vercel's Hobby plan allows 300, which is why
+serverless works here at all — but Hobby is non-commercial, so a tool a team
+depends on belongs on a paid plan or a small container elsewhere.
+
 ## Tests
 
 ```bash

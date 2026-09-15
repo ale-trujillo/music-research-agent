@@ -19,6 +19,7 @@ reach into anything above this module.
 from __future__ import annotations
 
 import json
+import os
 from abc import ABC, abstractmethod
 from datetime import UTC, datetime
 from pathlib import Path
@@ -152,3 +153,84 @@ class JsonFileStore(FavoriteStore):
         self.path.write_text(
             json.dumps([f.model_dump(mode="json") for f in favorites], indent=2, ensure_ascii=False)
         )
+
+
+class RedisStore(FavoriteStore):
+    """Favorites in Upstash Redis, over its REST API.
+
+    A deployed function has no durable filesystem, so the JSON file cannot
+    follow. REST rather than a Redis client on purpose: a serverless invocation
+    cannot hold a connection open between requests, and an HTTP call needs no
+    pool to manage or tear down.
+
+    Everything lives under one key. A favorites list is small, read whole on
+    every view, and written rarely — splitting it across keys would buy nothing
+    and cost a round trip per artist.
+    """
+
+    KEY = "favorites"
+
+    def __init__(self, url: str, token: str):
+        self.url = url.rstrip("/")
+        self.headers = {"Authorization": f"Bearer {token}"}
+
+    def load(self) -> list[Favorite]:
+        import httpx
+
+        response = httpx.get(f"{self.url}/get/{self.KEY}", headers=self.headers, timeout=10)
+        response.raise_for_status()
+        raw = response.json().get("result")
+        if not raw:
+            return []
+        return [Favorite.model_validate(item) for item in json.loads(raw)]
+
+    def save_all(self, favorites: list[Favorite]) -> None:
+        import httpx
+
+        payload = json.dumps([f.model_dump(mode="json") for f in favorites], ensure_ascii=False)
+        response = httpx.post(
+            f"{self.url}/set/{self.KEY}", headers=self.headers, content=payload, timeout=10
+        )
+        response.raise_for_status()
+
+
+def _writable(path: Path) -> bool:
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        probe = path.parent / ".write-probe"
+        probe.touch()
+        probe.unlink()
+        return True
+    except OSError:
+        return False
+
+
+def open_store() -> FavoriteStore:
+    """Redis when a deployment provides it, a file otherwise.
+
+    Both Vercel's KV integration and a direct Upstash project are accepted,
+    since they set different names for the same service.
+
+    Without either, a deployed instance still has to run: the working directory
+    is read-only there, so the file falls back to /tmp. Those favorites last
+    only as long as the instance does, which is why the persistence warning
+    below exists — a saved artist quietly disappearing is worse than one that
+    never saved.
+    """
+    url = os.getenv("KV_REST_API_URL") or os.getenv("UPSTASH_REDIS_REST_URL")
+    token = os.getenv("KV_REST_API_TOKEN") or os.getenv("UPSTASH_REDIS_REST_TOKEN")
+    if url and token:
+        return RedisStore(url, token)
+
+    path = Path(os.getenv("FAVORITES_PATH", "favorites.json"))
+    if not _writable(path):
+        path = Path("/tmp/favorites.json")
+    return JsonFileStore(path)
+
+
+def storage_is_durable() -> bool:
+    """False when favorites will not survive the instance."""
+    return bool(
+        (os.getenv("KV_REST_API_URL") or os.getenv("UPSTASH_REDIS_REST_URL"))
+        and (os.getenv("KV_REST_API_TOKEN") or os.getenv("UPSTASH_REDIS_REST_TOKEN"))
+    ) or not os.getenv("VERCEL")

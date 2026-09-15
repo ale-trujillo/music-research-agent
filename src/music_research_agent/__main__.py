@@ -22,7 +22,7 @@ from .collect import collect
 from .render import render
 from .discover import expand
 from .search import search_artists
-from .store import JsonFileStore
+from .store import open_store
 from .triage import triage
 
 
@@ -64,7 +64,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def run_favorites() -> int:
-    favorites = JsonFileStore().load()
+    favorites = open_store().load()
     if not favorites:
         print("No saved artists yet. Add one with --save.", file=sys.stderr)
         return 1
@@ -132,12 +132,12 @@ async def run(args: argparse.Namespace) -> int:
     if args.favorites:
         return run_favorites()
     if args.forget:
-        removed = JsonFileStore().remove(args.forget)
+        removed = open_store().remove(args.forget)
         print("Removed." if removed else f"No saved artist matched {args.forget!r}",
               file=sys.stderr)
         return 0 if removed else 1
     if args.from_favorites:
-        seeds = JsonFileStore().seeds()
+        seeds = open_store().seeds()
         if not seeds:
             print("No saved artists to seed from. Add some with --save.", file=sys.stderr)
             return 1
@@ -165,7 +165,7 @@ async def run(args: argparse.Namespace) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     if args.save:
-        favorite = JsonFileStore().add(bundle, note=args.note)
+        favorite = open_store().add(bundle, note=args.note)
         print(f"  saved to favorites ({len(favorite.readings)} reading(s) recorded)",
               file=sys.stderr)
 
