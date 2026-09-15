@@ -345,7 +345,11 @@ function identityCard(p) {
   fact('Name', p.name);
   fact('Person or group', p.kind, gap);
   fact('From', [p.origin, p.country].filter(Boolean).join(', '), gap);
-  fact('Active since', p.active_since, gap);
+  // MusicBrainz records a birth date for people and a formation date for groups.
+  // Neither is a career start, so the label comes from the source rather than
+  // being assumed — calling a 1998 birth date "active since 1998" is just wrong.
+  fact(p.life_span_label || 'Born or formed', p.life_span_begin, gap);
+  fact('First release', p.first_release, 'no dated release found');
   fact('Releases', p.releases != null ? p.releases.toLocaleString() : null, 'not available');
   fact('Songs', p.songs != null ? p.songs.toLocaleString() : null, 'not available');
   panel.append(facts);

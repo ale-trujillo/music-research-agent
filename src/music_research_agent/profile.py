@@ -46,7 +46,22 @@ class ArtistProfile(BaseModel):
     kind: str | None = Field(default=None, description="Person or Group, per MusicBrainz")
     country: str | None = None
     origin: str | None = Field(default=None, description="City or area the artist is from")
-    active_since: str | None = None
+    life_span_begin: str | None = Field(
+        default=None,
+        description="MusicBrainz life-span start. For a Person this is a birth date, "
+        "for a Group a formation date — never a career start, which is why the label "
+        "travels with it rather than being assumed.",
+    )
+    life_span_label: str | None = Field(
+        default=None,
+        description="'Born' for a person, 'Formed' for a group, 'Born or formed' when "
+        "MusicBrainz records no type — the label is never inferred from the date",
+    )
+    first_release: str | None = Field(
+        default=None,
+        description="Earliest dated release in the catalogue — the closest honest proxy "
+        "for when the artist started putting music out",
+    )
     releases: int | None = None
     songs: int | None = Field(default=None, description="Summed from tracklists, not inferred")
     links: list[Link] = Field(default_factory=list)
@@ -82,7 +97,8 @@ async def build_profile(
     profile.unestablished = [
         label for label, value in (
             ("origin", profile.origin), ("country", profile.country),
-            ("active since", profile.active_since), ("person or group", profile.kind),
+            ("date of birth or formation", profile.life_span_begin),
+            ("person or group", profile.kind),
         ) if not value
     ]
     return profile
@@ -124,6 +140,12 @@ async def _deezer_counts(
     )).json().get("data", [])
     if not albums:
         return
+
+    # The earliest release is the closest thing to a career start that public
+    # sources actually carry. It is a floor, not a fact: a catalogue can be
+    # incomplete, and re-releases carry their reissue date.
+    dated = sorted(a["release_date"] for a in albums if a.get("release_date"))
+    profile.first_release = dated[0] if dated else None
 
     gate = asyncio.Semaphore(MAX_CONCURRENT)
 
@@ -170,6 +192,11 @@ async def _musicbrainz(
     profile.kind = match.get("type")
     profile.country = match.get("country")
     profile.origin = (match.get("begin-area") or match.get("area") or {}).get("name")
-    profile.active_since = (match.get("life-span") or {}).get("begin")
+    profile.life_span_begin = (match.get("life-span") or {}).get("begin")
+    profile.life_span_label = {
+        "Person": "Born", "Group": "Formed", "Orchestra": "Formed", "Choir": "Formed",
+        # Without a type we cannot tell a birth from a formation, and guessing
+        # is what produced the mislabel this replaces.
+    }.get(profile.kind, "Born or formed")
     if mbid := match.get("id"):
         profile.links.append(Link(platform="MusicBrainz", url=f"https://musicbrainz.org/artist/{mbid}"))
