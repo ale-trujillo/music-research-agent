@@ -23,6 +23,7 @@ from pydantic import BaseModel, Field
 
 from .analysis.engine import AnalysisEngine
 from .assemble import Assembler
+from .catalogue import Concentration
 from .collect import collect
 from .compare import Comparison, compare
 from .discover import expand
@@ -65,6 +66,10 @@ class ArtistSummary(BaseModel):
     identity: Identity
     profile: ArtistProfile
     shape: AudienceShape
+    concentration: list[Concentration] = Field(
+        default_factory=list,
+        description="Play distribution per platform — one hit or a catalogue",
+    )
     metrics: list[Evidence]
     sources_used: list[str]
     sources_absent: list[str]
@@ -129,6 +134,7 @@ async def api_artist(query: str = Query(min_length=1)) -> ArtistSummary:
         profile=profile,
         saved=saved,
         shape=build_shape(bundle),
+        concentration=bundle.concentration,
         metrics=[i for i in bundle.items
                  if isinstance(i.value, int) and not isinstance(i.value, bool)],
         sources_used=bundle.sources_used,

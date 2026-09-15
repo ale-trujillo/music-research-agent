@@ -111,6 +111,30 @@
              border: 1px solid var(--line); border-radius: 7px; padding: 5px 11px; }
   .links a:hover { border-color: var(--accent); }
   .saved-note { color: var(--good); font-size: 0.87rem; }
+
+  /* Chart. Single series, so no legend — the heading names it. Colour is
+     categorical slot 1 from the validated palette, checked against both
+     surfaces: contrast >= 3:1 in each. */
+  .viz { --series-1: #2a78d6; --track: #efece8; margin-top: 6px; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .viz { --series-1: #3987e5; --track: #2b2932; }
+  }
+  :root[data-theme="dark"] .viz { --series-1: #3987e5; --track: #2b2932; }
+  .verdict { font-size: 1.02rem; font-weight: 600; margin: 0 0 2px; }
+  .verdict .lead { color: var(--accent); }
+  .bars { display: grid; grid-template-columns: minmax(0, 13rem) 1fr auto;
+          gap: 2px 12px; align-items: center; }
+  .bars .lbl { font-size: 0.86rem; overflow: hidden; text-overflow: ellipsis;
+               white-space: nowrap; }
+  .bars .lbl .vcount { color: var(--muted); font-size: 0.78rem; }
+  /* Baseline end square, data end rounded 4px, thin mark. */
+  .bars .track { background: var(--track); border-radius: 0 4px 4px 0; height: 14px; }
+  .bars .fill { background: var(--series-1); height: 100%;
+                border-radius: 0 4px 4px 0; min-width: 2px; }
+  .bars .val { font-family: var(--mono); font-size: 0.82rem;
+               font-variant-numeric: tabular-nums; }
+  .bars > div { min-width: 0; }
+  @media (max-width: 560px) { .bars { grid-template-columns: minmax(0, 8rem) 1fr auto; } }
 </style>
 </head>
 <body>
@@ -320,12 +344,54 @@ async function openArtist(query, displayName) {
     d.shape.notes.forEach(n => panel.append(el('div', 'note', n)));
     body.append(panel);
 
+    (d.concentration || []).forEach(c => body.append(concentrationPanel(c)));
+
     const slot = el('div'); slot.id = 'reportslot';
     body.append(slot);
   } catch (err) {
     body.innerHTML = '';
     body.append(el('div', 'panel')).append(el('div', 'empty', err.message));
   }
+}
+
+function concentrationPanel(c) {
+  const panel = el('div', 'panel');
+  panel.append(el('h3', null, `Where the ${c.unit} come from · ${c.platform}`));
+
+  // The headline is the finding; the bars are the evidence for it. Reports
+  // repeatedly flagged this as the thing they could not settle — a large view
+  // count that might be one outlier or a steady base.
+  const verdict = el('p', 'verdict');
+  verdict.append(document.createTextNode(c.verdict.charAt(0).toUpperCase() + c.verdict.slice(1)));
+  verdict.append(el('span', 'lead', `  ·  top song ${c.top_share}%`));
+  panel.append(verdict);
+  panel.append(el('p', 'sub',
+    `${c.measured_total.toLocaleString()} ${c.unit} measured across ${c.items_measured} items. `
+    + 'Versions of the same song are grouped.'));
+
+  const viz = el('div', 'viz');
+  const bars = el('div', 'bars');
+  const max = Math.max(...c.works.map(w => w.share), 1);
+  c.works.forEach(w => {
+    const label = el('div', 'lbl');
+    label.append(document.createTextNode(w.title));
+    if (w.variants > 1) label.append(el('span', 'vcount', `  ${w.variants} versions`));
+    label.title = w.title;
+
+    const track = el('div', 'track');
+    const fill = el('div', 'fill');
+    fill.style.width = `${(w.share / max) * 100}%`;
+    // Hover carries the exact figure so the bars stay free of numbers.
+    track.title = `${w.title}\n${w.plays.toLocaleString()} ${c.unit} · ${w.share}%`;
+    track.append(fill);
+
+    bars.append(label, track, el('div', 'val', `${w.share}%`));
+  });
+  viz.append(bars);
+  panel.append(viz);
+
+  if (!c.covers_everything && c.caveat) panel.append(el('div', 'note', c.caveat));
+  return panel;
 }
 
 function identityCard(p) {

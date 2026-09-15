@@ -62,6 +62,10 @@ class EvidenceBundle(BaseModel):
     items: list[Evidence] = Field(default_factory=list)
     sources_used: list[str] = Field(default_factory=list)
     sources_failed: list[SourceFailure] = Field(default_factory=list)
+    concentration: list[Any] = Field(
+        default_factory=list,
+        description="Per-platform play distribution, kept structured for charting",
+    )
     raw: dict[str, Any] = Field(
         default_factory=dict,
         description="Untouched payloads, for the qualitative deep-dive agent",
