@@ -234,8 +234,15 @@ async def api_report(
 
 @app.get("/")
 def index() -> FileResponse:
-    return FileResponse(STATIC / "index.html")
+    page = STATIC / "index.html"
+    if not page.exists():
+        raise HTTPException(
+            500, "The interface files did not ship with this deployment. The API "
+            "endpoints under /api still work.")
+    return FileResponse(page)
 
 
-if STATIC.exists():
+# Mounting a directory that did not travel with the deployment raises at import
+# time, which turns a missing asset into a dead service.
+if STATIC.is_dir():
     app.mount("/static", StaticFiles(directory=STATIC), name="static")
