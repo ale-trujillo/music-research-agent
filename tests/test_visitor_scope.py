@@ -99,6 +99,29 @@ def test_the_shared_bucket_name_is_gone():
     assert "favorites:shared" not in source
 
 
+def test_discovery_has_a_seed_for_a_visitor_with_no_favorites():
+    """Per-visitor lists made the seedless first visit the normal one."""
+    from music_research_agent.api import DEMO_SEEDS
+
+    assert DEMO_SEEDS, "an empty default puts the error back on the discover tab"
+
+
+def test_no_demo_seed_comes_from_the_acceptance_set():
+    """A default seed is a name compiled into a public deployment -- the most
+    permanent place a private shortlist could end up. GOLDEN_SET.md is kept out
+    of version control, so this only runs where the file is."""
+    from pathlib import Path
+
+    from music_research_agent.api import DEMO_SEEDS
+
+    golden = Path(__file__).resolve().parent.parent / "GOLDEN_SET.md"
+    if not golden.exists():
+        pytest.skip("acceptance set not present; nothing to check against")
+    listed = golden.read_text().casefold()
+    for seed in DEMO_SEEDS:
+        assert seed.casefold() not in listed, f"{seed!r} is in the acceptance set"
+
+
 class TestOverHttp:
     """The rejection has to happen at the edge, before anything is written."""
 

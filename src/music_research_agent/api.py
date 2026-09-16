@@ -267,6 +267,19 @@ def api_compare(
     return compare(favorites)
 
 
+# Discovery expands saved artists, so a visitor arriving for the first time has
+# nothing to expand and used to meet an error on the one tab meant to
+# demonstrate itself. Per-visitor lists made that the normal first experience
+# rather than an edge case: before them, the owner's list seeded everyone's.
+#
+# Deliberately an artist this repository already publishes — examples/ carries a
+# full report for her. The acceptance set in GOLDEN_SET.md is kept out of
+# version control on purpose and must not be used here: a default seed is a name
+# compiled into a public deployment, which is the most permanent place a private
+# shortlist could end up.
+DEMO_SEEDS = ("Ela Taubert",)
+
+
 @app.get("/api/discover", response_model=list[Triaged])
 async def api_discover(
     seeds: str | None = None, top: int = 20,
@@ -275,7 +288,7 @@ async def api_discover(
     """Expansion and triage cost nothing, so this endpoint is cheap to call."""
     seed_list = [s.strip() for s in seeds.split(",")] if seeds else store.seeds()
     if not seed_list:
-        raise HTTPException(400, "no seeds — save some artists first")
+        seed_list = list(DEMO_SEEDS)
     async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
         candidates = await expand(seed_list, client)
         return (await triage(candidates, client))[:top]
