@@ -159,6 +159,35 @@ class JsonFileStore(FavoriteStore):
 SAFE_SCOPE = re.compile(r"[^A-Za-z0-9_-]")
 
 
+def clean_scope(scope: str | None) -> str | None:
+    """A visitor's opaque id reduced to what is safe inside a key, or None.
+
+    None means the request carried nothing usable. Callers must read that as a
+    missing id and never as a default: the shared bucket this used to fall back
+    to was readable and writable by every visitor, which is the exact leak that
+    per-visitor keys exist to prevent.
+    """
+    clean = SAFE_SCOPE.sub("", scope or "")[:64]
+    return clean or None
+
+
+class EmptyStore(FavoriteStore):
+    """The store for a request that carried no visitor id.
+
+    A read returning nothing is the honest answer — an unidentified caller has
+    no favorites — and it keeps the endpoint working for anyone poking at the
+    API. A write raises instead of vanishing quietly; the API refuses those
+    earlier with a 400, so this is the backstop rather than the message anyone
+    should meet.
+    """
+
+    def load(self) -> list[Favorite]:
+        return []
+
+    def save_all(self, favorites: list[Favorite]) -> None:
+        raise RuntimeError("a visitor id is required to save favorites")
+
+
 class RedisStore(FavoriteStore):
     """Favorites in Upstash Redis, over its REST API.
 
@@ -177,11 +206,13 @@ class RedisStore(FavoriteStore):
     round trip per artist and buy nothing.
     """
 
-    def __init__(self, url: str, token: str, scope: str | None = None):
+    def __init__(self, url: str, token: str, scope: str):
         self.url = url.rstrip("/")
         self.headers = {"Authorization": f"Bearer {token}"}
-        clean = SAFE_SCOPE.sub("", scope or "")[:64]
-        self.KEY = f"favorites:{clean}" if clean else "favorites:shared"
+        clean = clean_scope(scope)
+        if clean is None:
+            raise ValueError("a visitor id is required; there is no shared list")
+        self.KEY = f"favorites:{clean}"
 
     def load(self) -> list[Favorite]:
         import httpx
@@ -214,25 +245,43 @@ def _writable(path: Path) -> bool:
         return False
 
 
+def _redis_env() -> tuple[str | None, str | None]:
+    """Both Vercel's KV integration and a direct Upstash project are accepted,
+    since they set different names for the same service."""
+    return (
+        os.getenv("KV_REST_API_URL") or os.getenv("UPSTASH_REDIS_REST_URL"),
+        os.getenv("KV_REST_API_TOKEN") or os.getenv("UPSTASH_REDIS_REST_TOKEN"),
+    )
+
+
+def scoped_storage() -> bool:
+    """True where lists are kept per visitor, so a request needs an id.
+
+    False locally, where there is one person and one file and the id is moot.
+    """
+    url, token = _redis_env()
+    return bool(url and token)
+
+
 def open_store(scope: str | None = None) -> FavoriteStore:
     """Redis when a deployment provides it, a file otherwise.
 
-    Both Vercel's KV integration and a direct Upstash project are accepted,
-    since they set different names for the same service.
+    `scope` is the visitor's opaque id, and it is what separates one visitor's
+    list from another's. On a shared deployment it is required: with no id
+    there is no list to open, so an empty store stands in rather than a bucket
+    everyone reads and writes. Locally there is one person and one file, so it
+    is ignored there.
 
-    `scope` separates one visitor's list from another's on a shared deployment.
-    Locally there is one person and one file, so it is ignored there.
-
-    Without either, a deployed instance still has to run: the working directory
+    Without Redis, a deployed instance still has to run: the working directory
     is read-only there, so the file falls back to /tmp. Those favorites last
     only as long as the instance does, which is why the persistence warning
     below exists — a saved artist quietly disappearing is worse than one that
     never saved.
     """
-    url = os.getenv("KV_REST_API_URL") or os.getenv("UPSTASH_REDIS_REST_URL")
-    token = os.getenv("KV_REST_API_TOKEN") or os.getenv("UPSTASH_REDIS_REST_TOKEN")
+    url, token = _redis_env()
     if url and token:
-        return RedisStore(url, token, scope)
+        clean = clean_scope(scope)
+        return RedisStore(url, token, clean) if clean else EmptyStore()
 
     path = Path(os.getenv("FAVORITES_PATH", "favorites.json"))
     if not _writable(path):
@@ -242,10 +291,7 @@ def open_store(scope: str | None = None) -> FavoriteStore:
 
 def storage_is_durable() -> bool:
     """False when favorites will not survive the instance."""
-    return bool(
-        (os.getenv("KV_REST_API_URL") or os.getenv("UPSTASH_REDIS_REST_URL"))
-        and (os.getenv("KV_REST_API_TOKEN") or os.getenv("UPSTASH_REDIS_REST_TOKEN"))
-    ) or not os.getenv("VERCEL")
+    return scoped_storage() or not os.getenv("VERCEL")
 
 
 class DailyBudget:

@@ -35,7 +35,15 @@ from .schema import ArtistReport, AudienceShape, Identity
 from .search import ArtistHit, search_artists
 from .profile import ArtistProfile, Link, build_profile
 from .shape import build_shape
-from .store import Favorite, FavoriteStore, open_budget, open_store, storage_is_durable
+from .store import (
+    Favorite,
+    FavoriteStore,
+    clean_scope,
+    open_budget,
+    open_store,
+    scoped_storage,
+    storage_is_durable,
+)
 from .triage import Triaged, triage
 
 load_dotenv()
@@ -50,8 +58,27 @@ def visitor_store(x_visitor: str | None = Header(default=None)) -> "FavoriteStor
     The browser mints an opaque id and keeps it; the server never learns who
     anyone is. Enough to stop a shared deployment from showing every visitor
     the same shortlist, which is what it did before.
+
+    A request carrying no id reads an empty list, not a shared one. The shared
+    fallback that used to sit here meant a single stale tab could put a private
+    shortlist somewhere every visitor could read it, which happened once.
     """
     return open_store(x_visitor)
+
+
+def writing_store(x_visitor: str | None = Header(default=None)) -> "FavoriteStore":
+    """The same list, for the two calls that change it.
+
+    Saving without an id is refused rather than written somewhere shared or
+    somewhere that disappears with the instance. A client that cannot mint an
+    id has a bug worth surfacing; a silent success is the worse answer, because
+    the artists go somewhere the person who saved them will not think to look.
+    """
+    if scoped_storage() and clean_scope(x_visitor) is None:
+        raise HTTPException(400, "an x-visitor id is required to change favorites")
+    return open_store(x_visitor)
+
+
 STATIC = Path(__file__).parent / "static"
 
 
@@ -212,7 +239,7 @@ def api_favorites(store: FavoriteStore = Depends(visitor_store)) -> list[Favorit
 
 @app.post("/api/favorites", response_model=Favorite)
 async def api_save(
-    request: SaveRequest, store: FavoriteStore = Depends(visitor_store)
+    request: SaveRequest, store: FavoriteStore = Depends(writing_store)
 ) -> Favorite:
     """Saving captures today's figures, so a second save produces a trend."""
     bundle = await collect(request.query)
@@ -222,7 +249,7 @@ async def api_save(
 
 
 @app.delete("/api/favorites/{key}")
-def api_forget(key: str, store: FavoriteStore = Depends(visitor_store)) -> dict[str, bool]:
+def api_forget(key: str, store: FavoriteStore = Depends(writing_store)) -> dict[str, bool]:
     if not store.remove(key):
         raise HTTPException(404, f"no saved artist matched {key!r}")
     return {"removed": True}
