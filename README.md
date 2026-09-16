@@ -4,6 +4,11 @@ Takes an artist name and produces a structured, source-cited A&R screening
 report. Built for **emerging Colombian artists**, where the data is thin and
 the failure mode that matters is a confident report about the wrong person.
 
+**Live: [music-research-agent.vercel.app](https://music-research-agent.vercel.app)**
+— search, artist pages, favorites, comparison and discovery are open and cost
+nothing. The full report sits behind a button on a shared allowance of 20 per
+day, because it is the only action in the system that spends money.
+
 ```bash
 # By name
 python -m music_research_agent "Artist Name"
@@ -137,11 +142,6 @@ needs either months of your own tracking or a licensed data provider that kept
 the history for you. This is the gap that most limits the product, and it cannot
 be closed retroactively.
 
-**Comparing two artists side by side.** The only item here that is ordinary work
-rather than a data limit. Everything needed is already computed — audience shape
-normalises platforms into stated units, and triage scores candidates on the same
-axes. A comparison view is presentation over existing signals.
-
 **Audience demographics and geography.** No public source exposes listeners by
 country or city, let alone by age or gender. Not an oversight: it is personal
 data under GDPR and Colombia's Ley 1581, and commercially sensitive besides — a
@@ -178,8 +178,8 @@ button — it is the only part of the system that spends money.
 ## Deploying
 
 ```bash
-vercel login && vercel        # preview
-vercel --prod
+vercel login && vercel        # first deploy, and preview builds thereafter
+git push origin main          # production: GitHub triggers it, ~30 seconds
 ```
 
 Set the source credentials as environment variables in the Vercel project —
@@ -202,6 +202,17 @@ up from either service's variable names. Without one, favorites fall back to
 `durable_favorites: false` so the gap is visible rather than discovered when a
 saved artist disappears.
 
+**Favorites are per visitor, and there is no account to create.** The browser
+mints an opaque id, keeps it in `localStorage` and sends it as `x-visitor`. The
+server uses it only to tell two visitors apart and never learns who anyone is.
+The first design kept a single list for the whole deployment, which on a public
+URL meant every visitor read — and could delete from — the owner's shortlist; a
+list of artists someone is quietly evaluating is exactly the thing they would
+not publish. A request arriving without an id reads an empty list and cannot
+write at all, rather than falling into a shared one. The trade for needing no
+sign-up is that the id is the only handle on a list: clearing site data, or
+opening the page in another browser, starts a fresh one.
+
 Reports take 35 to 80 seconds. Vercel's Hobby plan allows 300, which is why
 serverless works here at all — but Hobby is non-commercial, so a tool a team
 depends on belongs on a paid plan or a small container elsewhere.
@@ -216,6 +227,12 @@ The suite is built around the failures this project actually hit, because they
 are the ones that recur: resolving a short artist name to a famous act instead
 of the target, a validator crying wolf on date fragments until nobody reads it,
 and an unreachable source scoring identically to an artist with nothing to show.
+
+The newest set covers the one that reached production. Favorites were written to
+a bucket shared by every visitor whenever the header identifying them was
+missing, because an absent id was read as a default rather than as an answer.
+One tab left open across a deploy was enough to put a private shortlist on a
+public endpoint, and the symptom looked like favorites disappearing.
 
 ## More
 
