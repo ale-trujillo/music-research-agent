@@ -5,9 +5,10 @@ report. Built for **emerging Colombian artists**, where the data is thin and
 the failure mode that matters is a confident report about the wrong person.
 
 **Live: [music-research-agent.vercel.app](https://music-research-agent.vercel.app)**
-— search, artist pages, favorites, comparison and discovery are open and cost
-nothing. The full report sits behind a button on a shared allowance of 20 per
-day, because it is the only action in the system that spends money.
+— search and artist pages work on arrival. Comparison and discovery build on
+the artists you save, since discovery is seeded by them and a comparison needs
+two. All of that is free. The full report sits behind a button on a shared
+allowance of 20 per day, because it is the only action that spends money.
 
 ```bash
 # By name
