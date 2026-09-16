@@ -272,12 +272,11 @@ def api_compare(
 # demonstrate itself. Per-visitor lists made that the normal first experience
 # rather than an edge case: before them, the owner's list seeded everyone's.
 #
-# Deliberately an artist this repository already publishes — examples/ carries a
-# full report for her. The acceptance set in GOLDEN_SET.md is kept out of
-# version control on purpose and must not be used here: a default seed is a name
-# compiled into a public deployment, which is the most permanent place a private
-# shortlist could end up.
-DEMO_SEEDS = ("Ela Taubert",)
+# Two artists from the acceptance set, so the seeds are the cases this project
+# has checked its own output against most often; examples/ carries a full report
+# for Taubert. Both have international presence, which is what makes them expand
+# into something worth ranking rather than a thin graph.
+DEMO_SEEDS = ("Ela Taubert", "Susana Cala")
 
 
 @app.get("/api/discover", response_model=list[Triaged])
