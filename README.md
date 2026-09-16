@@ -239,4 +239,5 @@ public endpoint, and the symptom looked like favorites disappearing.
 
 `SOURCES.md` — the feasibility matrix, written from probing rather than docs.
 `AUDIT.md` — acceptance results, including the two criteria that could not be
-tested and why. `PLAN.md` — scope.
+tested and why. `PLAN.md` — the plan and what shipped, with every box checked
+against the code and the ones that did not ship left open with the reason.

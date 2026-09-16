@@ -1,130 +1,173 @@
-# MVP en 3 días — Music Research Agent
+# Plan, and what shipped
 
-**Owner:** Alejandro Trujillo · **Fecha:** 2026-09-12 · `ROADMAP.md` queda parqueado (plan a 4-5 semanas)
+**Owner:** Alejandro Trujillo · **Started:** 12 September 2026 · **MVP:** three days
+
+This is the only planning document. A five-week roadmap preceded it and was
+parked on day one when the scope became a three-day MVP; it has been deleted
+rather than left to rot, because a plan nobody is following reads as a project
+nobody finished.
+
+Every box below was checked against the code, not from memory. Where something
+was planned and did not ship, the box stays open and says why. For a tool whose
+whole argument is that absence is a finding, a plan that hid its own gaps would
+be the wrong first thing to read.
 
 ---
 
-## Spec confirmada
+## Confirmed spec
 
-| Dimensión | Decisión |
+| Dimension | Decision |
 |---|---|
-| Usuario | A&R / fichaje |
-| Artistas | **Emergentes en Colombia** |
-| Fuentes | Solo APIs oficiales gratuitas (sin presupuesto) |
-| Entrega | CLI → `report.json` + `report.md` |
-| Arquitectura | Híbrida: pipeline determinista + sub-agente para lo cualitativo |
-| Alcance | Las 6 funcionalidades, **con confianza marcada** por sección |
-| Mercados | Colombia (dónde pega) + ruta de expansión |
-| Trazabilidad | Citas + **validador anti-alucinación bloqueante** |
-| Idioma | Inglés |
-| Equipo | Solo dev, 3 días |
+| User | A&R / signing |
+| Artists | **Emerging, in Colombia** |
+| Sources | Free official APIs only, no budget |
+| Delivery | CLI → `report.json` + `report.md` |
+| Architecture | Hybrid: deterministic pipeline, model for the qualitative |
+| Scope | All six sections, **each carrying its own confidence** |
+| Markets | Colombia, plus an expansion route |
+| Traceability | Citations + an anti-hallucination validator |
+| Language | English |
+| Team | One developer, three days |
 
-**El día extra compra la pieza que más importa:** con 2 días el validador salía en modo warning. Con 3 sale **bloqueante** — ninguna cifra sin fuente llega al reporte. Es justo el blindaje que pediste, y con artistas emergentes es donde más se nota.
+The third day bought the validator. At two days it would have shipped as a
+warning with nothing behind it; the extra day made it something the report is
+actually assembled through.
 
 ---
 
-## Golden set (criterio de aceptación)
+## Acceptance set
 
-El MVP está listo cuando corre limpio sobre 6 artistas emergentes colombianos reales.
-La lista concreta vive en `GOLDEN_SET.md`, fuera de control de versiones.
+The MVP is done when it runs clean over six real emerging Colombian artists. The
+list itself lives in `GOLDEN_SET.md`, outside version control — not because the
+names are secret, but because the notes next to them are working judgements, not
+published claims. What matters about the test design is the profiles it covers:
 
-Lo que importa del diseño de la prueba son los perfiles que cubre:
-
-| Perfil | Qué pone a prueba |
+| Profile | What it tests |
 |---|---|
-| Presencia internacional | El caso "más fácil": data abundante en todas las fuentes |
-| Singer-songwriter con prensa | Narrativa y contexto cualitativo |
-| **Nombre común** | Prueba dura de desambiguación |
-| Nombre atípico | Resolución exacta |
-| **Nombre corto/ambiguo** | Colisión probable en búsqueda |
-| **Baja huella digital** | Degradación con gracia |
+| International presence | The easy case: data in every source |
+| Singer-songwriter with press | Narrative and qualitative context |
+| **Common name** | Hard disambiguation |
+| Unusual name | Exact resolution |
+| **Short or ambiguous name** | Likely search collision |
+| **Low digital footprint** | Degrading gracefully |
 
-> Los tres marcados son los valiosos. Un agente que solo funciona con perfiles de
-> data abundante no sirve para A&R de emergentes.
-
----
-
-## Aritmética
-
-| Bloque | Est. |
-|---|---|
-| Setup + schema | 2h ✅ |
-| Adapters (5 fuentes) | 4h |
-| Evidence bundle + normalize | 2h |
-| 6 secciones de análisis | 4h |
-| Validador anti-alucinación | 3h |
-| CLI + renderer | 2h |
-| Pruebas sobre el golden set | 2h |
-| **Total** | **~19h → ~6.5h/día** |
+> The three marked are the valuable ones. An agent that only works on artists
+> with abundant data is no use for A&R on emerging acts.
 
 ---
 
-## La tensión honesta
+## The honest tension
 
-**Emergentes colombianos + APIs gratuitas = reportes delgados.** Un artista con 3k oyentes tendrá Spotify y YouTube, casi nada en Last.fm, nada en Bandsintown. El validador va a dejar **muchos campos en `null`** — eso no es el sistema fallando, es el sistema siendo honesto. La alternativa (rellenar con estimaciones del LLM) es justo lo que decidimos evitar.
+**Emerging Colombian artists plus free APIs equals thin reports.** An artist
+with 3,000 listeners has Spotify and YouTube, little on Last.fm, nothing on
+Bandsintown. The validator leaves **many fields `null`** — that is not the
+system failing, it is the system being honest. The alternative, letting the
+model fill the gaps with estimates, is the exact thing this design exists to
+avoid.
 
-> **Reencuadre de producto:** para emergentes, la ausencia de data *es* la señal de A&R. Un artista sin prensa ni shows registrados es un perfil distinto al que sí los tiene. El reporte hace esa distinción legible en vez de esconderla.
+> **Product reframe:** for emerging artists, absent data *is* the A&R signal. An
+> artist with no press and no registered shows is a different profile from one
+> who has them. The report makes that distinction legible instead of hiding it.
 
-**Sin loop de validación con un A&R real**, el MVP se valida técnicamente (¿corre? ¿cita bien?), no por utilidad. Deuda declarada.
-
----
-
-## Día 1 — El espinazo (data citable, sin LLM)
-
-**Meta: `python -m music_research_agent "<artista>" --raw` escupe JSON con evidencia citada.**
-
-- [x] Scaffold + venv + `requirements.txt` + `.env.example`
-- [x] `schema.py` — el contrato Pydantic (es el producto)
-- [x] `SourceAdapter` base: falla aislada, timeout, retry
-- [x] Adapters, en orden de valor para emergentes CO:
-  1. **Spotify** — identidad, followers, popularity, releases *(el ancla)*
-  2. **YouTube Data** — canal, views, uploads recientes
-  3. **MusicBrainz** — ID canónico, relaciones, país
-  4. **Last.fm** — tags, similares *(esperar huecos)*
-  5. **Web search** — prensa, contexto de escena
-- [x] Resolución de identidad + desambiguación + `--spotify-id` override
-- [x] `EvidenceBundle` con `source`/`url`/`retrieved_at`/`confidence` por dato
-- [ ] Cache en disco  *(no hecho: las cuotas se agotaron por probing, no por falta de cache)* (no quemar rate limits mientras iteras)
-
-**Exit:** los 6 artistas resueltos a la entidad correcta + matriz de qué fuente respondió qué.
-
-## Día 2 — El cerebro
-
-**Meta: 6 secciones pobladas, cada una con confianza marcada.**
-
-- [x] Capa de análisis (el LLM ve **solo** el bundle, nunca recuerda cifras):
-  `positioning` · `comparables` · `markets` (CO + expansión) · `recent_activity` · `signals/momentum` · `ar_summary`
-- [ ] Sub-agente de deep dive  *(no hecho: sin fuente de prensa en el MVP)*: prensa y escena (lo cualitativo sin API)
-- [x] `confidence` + `evidence_basis` por sección
-
-**Exit:** reporte completo en JSON para los 6.
-
-## Día 3 — Blindaje y entrega
-
-- [x] **Validador anti-alucinación** *(warning + exit code 2, no bloqueante)* — rechaza toda cifra ausente del bundle
-- [x] Renderer Markdown derivado del JSON (nunca escrito aparte)
-- [x] CLI completo + `data_quality` visible en el reporte
-- [x] Auditoría manual de los 6 → `AUDIT.md`: cero cifras sin fuente
-- [x] README + setup
-
-**Exit:** MVP. Los 6 corren limpio, auditados a mano.
+**No validation loop with a real A&R.** The MVP is validated technically — does
+it run, does it cite correctly — not for usefulness. Declared debt, and it is
+still open.
 
 ---
 
-## Bloqueante: credenciales
+## Day 1 — the spine (citable data, no model)
 
-Todas gratis, van en `.env` (plantilla en `.env.example`):
+- [x] Scaffold, venv, `requirements.txt`, `.env.example`
+- [x] `schema.py` — the Pydantic contract, which is the product
+- [x] `SourceAdapter` base: isolated failure, timeout, retry
+- [x] Identity resolution, disambiguation, and a `--spotify-id` override
+- [x] `EvidenceBundle` carrying `source` / `url` / `retrieved_at` / `confidence`
+      per datum
+- [x] Disk cache — `.cache/`, 24h for complete runs, 1h where a source failed,
+      `--no-cache` to force a re-query *(planned as day 1, built after the MVP,
+      once probing had burned a Spotify allowance)*
 
-| Fuente | Dónde | Estado |
-|---|---|---|
-| **Spotify** *(crítico — ancla de identidad)* | developer.spotify.com/dashboard | ⬜ |
-| **YouTube Data v3** | console.cloud.google.com | ⬜ |
-| **Last.fm** | last.fm/api/account/create | ⬜ |
-| Genius *(opcional)* | genius.com/api-clients | ⬜ |
-| MusicBrainz | sin key, solo User-Agent | ✅ |
+**Adapters, and how the plan changed on contact:**
+
+- [x] **Deezer** — unplanned, and now the strongest source here. Unauthenticated,
+      unmetered, complete catalogue
+- [x] **YouTube Data** — channel, views, recent uploads
+- [x] **Last.fm** — tags and similar artists, as expected with holes
+- [x] **MusicBrainz** — canonical ID, relations, country
+- [x] **Spotify** — demoted to identity anchor only. Apps created under the
+      current regime return no followers, popularity or genres, and 403 on batch
+      lookup. It was taken out of the fan-out; `SOURCES.md` has the probing
+- [ ] **Web search for press and scene context** — never built. There is no free
+      API for it worth citing, and an uncited press summary is the kind of claim
+      this project refuses to make
+
+## Day 2 — the brain
+
+- [x] Analysis layer where the model sees **only** the bundle and never recalls a
+      figure: `positioning` · `comparables` · `markets` · `recent_activity` ·
+      `signals` · `ar_summary`
+- [x] `confidence` and `evidence_basis` per section
+- [ ] Deep-dive sub-agent for press and scene — dropped with the web search it
+      depended on
+
+## Day 3 — armour and delivery
+
+- [x] **Anti-hallucination validator.** A cited key that resolves to nothing
+      drops the claim and lands in `data_quality.ungrounded_claims`; prose is
+      scanned for figures no source returned. It warns and exits 2 rather than
+      refusing to write the report, so the reader sees both the report and what
+      is wrong with it
+- [x] Markdown renderer derived from the JSON, never written alongside it
+- [x] Full CLI with `data_quality` visible in the report
+- [x] Manual audit of all six → `AUDIT.md`
+- [x] README and setup
 
 ---
 
-## Fuera de alcance (v2)
+## After the MVP
 
-Chartmetric · batch screening · diffs temporales · TikTok/Instagram · API/frontend · PDF
+All of this was listed out of scope and shipped anyway, which is why the
+original roadmap stopped being the plan.
+
+- [x] **Web interface** — FastAPI plus a single-page front end: search, artist
+      pages, catalogue breakdown, favorites, comparison, discovery
+- [x] **Deployed** at [music-research-agent.vercel.app](https://music-research-agent.vercel.app),
+      production on a push to `main`
+- [x] **Favorites as a time series.** Saving records the figures of the day, so a
+      second save produces the first trend line this system has had — the one
+      thing no free source exposes
+- [x] **Per-visitor favorites.** An opaque id the browser mints and keeps, with
+      no account to create. The first design shared one list across the whole
+      deployment, which on a public URL meant every visitor read and could
+      delete the owner's shortlist
+- [x] **Side-by-side comparison** over saved artists, in the web interface
+- [x] **Seed-based discovery** with triage ranking, seeded by saved artists and
+      by two examples for a visitor who has saved nothing
+- [x] **A daily allowance on the paid action.** Report generation is the only
+      call that spends money; `FREE_REPORTS_PER_DAY` bounds the day and
+      `REPORT_TOKEN` skips it, checked first so the owner never eats a visitor's
+      share
+- [x] **Durable storage** through Vercel KV or Upstash Redis, with
+      `/api/health` reporting `durable_favorites` so the gap is visible rather
+      than discovered when a saved artist disappears
+
+---
+
+## Still open
+
+- **No A&R has read a report.** The tool is verified correct, not verified
+  useful, and that distinction should travel with any conclusion drawn from this
+  repository
+- **Live performance data is absent.** Bandsintown returns 403 without granted
+  authorisation, Songkick's API programme is closed, and MusicBrainz has no
+  meaningful coverage here. Touring is where an emerging artist's traction shows
+  first, so this is a real blind spot
+- **Trajectory before you started watching.** Favorites accumulate a series from
+  the day you save, and nothing recovers what came before without a licensed
+  provider
+- `GENIUS_ACCESS_TOKEN` sits in `.env.example` and is read by nothing. Genius was
+  probed and dropped; the variable should go with it
+
+## Out of scope
+
+Chartmetric · batch screening · TikTok and Instagram · PDF export
