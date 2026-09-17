@@ -241,3 +241,15 @@ public endpoint, and the symptom looked like favorites disappearing.
 `AUDIT.md` — acceptance results, including the two criteria that could not be
 tested and why. `PLAN.md` — the plan and what shipped, with every box checked
 against the code and the ones that did not ship left open with the reason.
+
+## Reuse
+
+Source-available for review, not licensed for reuse. There is no open-source
+licence here and none is implied: copyright stays with the author, so read it,
+run it, fork it on GitHub to look around — but ask before building on it. The
+absent `LICENSE` is a decision rather than a missing file.
+
+The data is a separate matter from the code. Figures in `examples/` came from
+Deezer, Last.fm, YouTube, MusicBrainz and Spotify and belong to them; each
+source's own terms govern what may be done with them, whatever this repository
+says about the code that fetched them.
